@@ -3,6 +3,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
+require('dotenv').config
+
 dotenv.config();
 const app = express();
 
