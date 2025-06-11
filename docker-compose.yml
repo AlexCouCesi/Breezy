@@ -1,4 +1,16 @@
 services:
+  nginx:
+    image: nginx:latest
+    container_name: gateway
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:8080"
+    networks:
+      - breezy-net
+    depends_on:
+      - auth
+
   backend:
     build:
       context: ./backend
@@ -21,6 +33,12 @@ services:
     environment:
       # pointe vers le backend dans le réseau docker
       - NEXT_PUBLIC_API_URL=http://backend:5000/api
+    networks:
+      - breezy-net
+
+  auth:
+    build: ./auth
+    container_name: auth
     networks:
       - breezy-net
 
