@@ -15,11 +15,23 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-bg">
-      <div className="text-center">
-        <Image src="/assets/logo_breezy.webp" alt="Logo Breezy" width={80} height={80} className="mx-auto mb-6" />
-        <h1 className="text-3xl font-bold mb-6 text-text">Bienvenue sur Breezy</h1>
-        <div className="flex gap-4 justify-center">
+    <div className="flex flex-col md:flex-row h-screen bg-bg">
+      {/* Bloc logo à gauche */}
+      <div className="flex-1 flex items-center justify-center bg-gray-100 p-8">
+        <div className="text-center">
+          <Image
+            src="/assets/logo_breezy.webp"
+            alt="Logo Breezy"
+            width={160}
+            height={160}
+            className="mx-auto mb-6"
+          />
+        </div>
+      </div>
+
+      {/* Bloc actions à droite */}
+      <div className="flex-1 flex items-center justify-center bg-white p-8">
+        <div className="flex flex-col md:flex-row gap-4">
           <Button onClick={() => router.push('/auth/login')}>S'authentifier</Button>
           <Button variant="secondary" onClick={() => router.push('/auth/register')}>
             Créer un compte

@@ -3,27 +3,24 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                bg: "#F9FAFB",
-                card: "#E5E7EB",
-                text: "#111827",
-                primary: "#3B82F6",
-                "primary-dark": "#1E40AF",
-                error: "#DC2626",
-                success: "#16A34A",
+                primary: "#3B82F6",          // bleu doux
+                secondary: "#1E293B",        // gris très foncé
+                accent: "#E0F2FE",           // bleu très pâle (hover / background doux)
+                bg: "#F8FAFC",               // fond clair général
+                card: "#FFFFFF",             // blocs / cartes
+                text: "#0F172A",             // noir bleuté lisible
             },
             fontFamily: {
                 sans: ["Inter", "sans-serif"],
             },
             borderRadius: {
-                DEFAULT: "0.5rem",
                 lg: "1rem",
                 full: "9999px",
             },
             boxShadow: {
-                card: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                soft: "0 4px 6px rgba(0, 0, 0, 0.05)",
+                soft: "0 4px 12px rgba(0, 0, 0, 0.05)",
             },
-        },
+            }
     },
     plugins: [],
 }
