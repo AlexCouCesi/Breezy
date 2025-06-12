@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import '../styles/globals.css';
+import Image from 'next/image';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,11 +19,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="fr">
+      <body className="bg-gray-50 text-gray-900 font-sans">
+        <header className="flex items-center px-6 py-4 bg-white shadow">
+          <Image src="/assets/logo-breezy.png" alt="Logo Breezy" width={40} height={40} />
+          <h1 className="ml-2 text-2xl font-semibold">Breezy</h1>
+        </header>
+        <main>{children}</main>
       </body>
     </html>
   );
