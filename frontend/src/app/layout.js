@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="fr">
       <body className="bg-gray-50 text-gray-900 font-sans">
         <header className="flex items-center px-6 py-4 bg-white shadow">
-          <Image src="/assets/logo-breezy.png" alt="Logo Breezy" width={40} height={40} />
+          <Image src="/assets/logo_breezy.webp" alt="Logo Breezy" width={80} height={80} className="mx-auto mb-6" />
           <h1 className="ml-2 text-2xl font-semibold">Breezy</h1>
         </header>
         <main>{children}</main>

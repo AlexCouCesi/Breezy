@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/button';
+import Image from 'next/image';
 
 export default function Home() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-bg">
       <div className="text-center">
-        <img src="/assets/logo-breezy.png" alt="Logo Breezy" className="h-20 mx-auto mb-6" />
+        <Image src="/assets/logo_breezy.webp" alt="Logo Breezy" width={80} height={80} className="mx-auto mb-6" />
         <h1 className="text-3xl font-bold mb-6 text-text">Bienvenue sur Breezy</h1>
         <div className="flex gap-4 justify-center">
           <Button onClick={() => router.push('/auth/login')}>S'authentifier</Button>
