@@ -13,9 +13,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-        const res = await axios.post('/api/auth/login', { email, password });
+        const res = await axios.post('http://localhost:4000/api/auth/login', { email, password });
       // stocker le token (ex. localStorage) et rediriger
-        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('accessToken', res.data.accessToken);
         router.push('/');
     } catch (err) {
         setError(err.response?.data?.message || 'Erreur de connexion');

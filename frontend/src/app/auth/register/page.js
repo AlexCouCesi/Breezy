@@ -23,10 +23,10 @@ export default function RegisterPage() {
         return;
     }
     try {
-        await axios.post('/api/auth/register', {
-        username: form.username,
-        email: form.email,
-        password: form.password,
+        await axios.post('http://localhost:4000/api/auth/register', {
+            username: form.username,
+            email: form.email,
+            password: form.password,
         });
       // après inscription, redirigez vers la page de login
         router.push('/auth/login');

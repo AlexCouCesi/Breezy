@@ -8,7 +8,7 @@ RUN npm install
 COPY . .
 
 # Expose le port de l'API
-EXPOSE 3000
+EXPOSE 4000
 
 # Démarrage
 CMD [ "node", "src/index.js" ]
