@@ -4,7 +4,7 @@ const User = require("../models/user.model");
 const User_DB = [];
 
 exports.register = (req, res) => {
-    var newUser = new User(req.body.username, bcrypt.hashSync(req.body.password, 10));
+    var newUser = new User(req.body.username, req.body.email, bcrypt.hashSync(req.body.password, 10));
     User_DB.push(newUser);
     return res.status(201).json({
     "msg": "New User created !"
@@ -12,11 +12,10 @@ exports.register = (req, res) => {
 };
 
 exports.login = (req, res) => {
-  const { username, password } = req.body;
-
-  const user = User_DB.find((u) => u.username === username && bcrypt.compareSync(password, u.password));
+  const { email, password } = req.body;
+  const user = User_DB.find((u) => u.email === email && bcrypt.compareSync(password, u.password));
   if (user) {
-    const accessToken = jwt.sign({ username: user.username, exp: Math.floor(Date.now() / 1000) + 120 }, process.env.ACCESS_JWT_KEY);
+    const accessToken = jwt.sign({ email: user.email, exp: Math.floor(Date.now() / 1000) + 120 }, process.env.ACCESS_JWT_KEY);
     return res.status(200).json({message : "You are now connected !", accessToken: accessToken});   
   } else {
     return res.status(401).json({ message: "Invalid credentials" });
@@ -40,7 +39,7 @@ exports.authenticate = (req, res) => {
         if (err || !user) {
             return res.status(401).json({ message: "Unauthorized" });
         } else {
-            return res.status(200).json({ message: "Authenticated"});
+            return res.status(200).json({ message: "Authenticated" });
         }
     });
 };

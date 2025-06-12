@@ -83,6 +83,12 @@
    npm install
    npm run dev
 
-5. Accès à l'application :
+5. Service d'authentification
+   ```bash
+   cd auth
+   npm install
+   npm run dev
+
+6. Accès à l'application :
 
 Accédez à l'application sur http://localhost:3000

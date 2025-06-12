@@ -6,8 +6,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));// parse requests of content-type - application/x-www-form-urlencoded
 
 require("dotenv").config();
-require('./routes/auth.routes')(app);
+app.use('/api/auth', require('./routes/auth.routes'));
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Breezy auth service listening on port ${port}`)
 })
