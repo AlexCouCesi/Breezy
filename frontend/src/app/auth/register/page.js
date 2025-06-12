@@ -23,7 +23,7 @@ export default function RegisterPage() {
         return;
     }
     try {
-        await axios.post('http://localhost:4000/api/auth/register', {
+        await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/register', {
             username: form.username,
             email: form.email,
             password: form.password,
@@ -31,6 +31,7 @@ export default function RegisterPage() {
       // après inscription, redirigez vers la page de login
         router.push('/auth/login');
     } catch (err) {
+        console.log(err);
         setError(err.response?.data?.message || 'Erreur lors de l’inscription');
     }
     };

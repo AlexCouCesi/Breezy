@@ -13,7 +13,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-        const res = await axios.post('http://localhost:4000/api/auth/login', { email, password });
+        const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
       // stocker le token (ex. localStorage) et rediriger
         localStorage.setItem('accessToken', res.data.accessToken);
         router.push('/');
