@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -14,9 +15,8 @@ export default function LoginPage() {
     setError('');
     try {
         const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
-      // stocker le token (ex. localStorage) et rediriger
-        localStorage.setItem('accessToken', res.data.accessToken);
-        router.push('/');
+        Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
+        router.push('/feed');
     } catch (err) {
         setError(err.response?.data?.message || 'Erreur de connexion');
     }
