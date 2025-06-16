@@ -9,7 +9,6 @@ export default function Feed() {
 
     useEffect(() => {
         const token = Cookies.get('accessToken');
-        console.log('Token:', token);
         if (!token) {
             router.replace('/auth/login');
         }

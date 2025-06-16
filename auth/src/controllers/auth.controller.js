@@ -38,16 +38,25 @@ exports.login = (req, res) => {
 
 exports.authenticate = (req, res) => {
     let bearer = req.headers["authorization"];
-    if (!bearer) {
-        return res.status(401).json({ message: "Unauthorized" });
+    let token;
+
+    if (bearer && bearer.split(" ")[0] === "Bearer") {
+        token = bearer.split(" ")[1];
+    } else if (req.cookies && req.cookies.accessToken) {
+        token = req.cookies.accessToken;
     }
-    let token = bearer.split(" ")[1];
-    if (bearer.split(" ")[0] !== "Bearer" || !token) {
+
+    if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
     jwt.verify(token, process.env.ACCESS_JWT_KEY, (err, decoded) => {
-        if (err) return res.sendStatus(401);
+        if (err) {
+            if (err.name === 'TokenExpiredError') {
+                return res.status(401).json({ message: "Token expired" });
+            }
+            return res.sendStatus(401);
+        }
         const user = User_DB.find(u => u.email === decoded.email);
         if (!user) return res.sendStatus(401);
         return res.sendStatus(200);

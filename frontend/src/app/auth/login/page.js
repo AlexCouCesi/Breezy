@@ -11,15 +11,19 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-        const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
-        Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
-        router.push('/feed');
-    } catch (err) {
-        setError(err.response?.data?.message || 'Erreur de connexion');
-    }
+        e.preventDefault();
+        setError('');
+        try {
+            const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
+            Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
+            if (router.pathname === '/feed') {
+                router.refresh();
+            } else {
+                router.push('/feed');
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || 'Erreur de connexion');
+        }
     };
 
     return (

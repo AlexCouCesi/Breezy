@@ -8,39 +8,22 @@ services:
       - "8080:8080"
     networks:
       - breezy-net
-    depends_on:
-      - auth
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - ./backend/.env
-    ports:
-      - "5000:5000"
+  frontend:
+    build: ./frontend
+    container_name: frontend
     networks:
       - breezy-net
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    environment:
-      # pointe vers le backend dans le réseau docker
-      - NEXT_PUBLIC_API_URL=http://backend:5000/api
+  backend:
+    build: ./backend
+    container_name: backend
     networks:
       - breezy-net
 
   auth:
     build: ./auth
     container_name: auth
-    ports:
-      - "4000:4000"
     networks:
       - breezy-net
 

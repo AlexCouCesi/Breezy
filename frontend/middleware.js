@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-
+// permet de rediriger les utilisateurs s'ils n'ont pas le token
+// ne vérifie pas l'authentification
 export function middleware(request) {
   const token = request.cookies.get('accessToken')?.value;
   if (!token && request.nextUrl.pathname.startsWith('/feed')) {

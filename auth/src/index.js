@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 const port = 4000
+const cookieParser = require('cookie-parser');
 
+app.use(cookieParser()); // Middleware to parse cookies 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));// parse requests of content-type - application/x-www-form-urlencoded
 
