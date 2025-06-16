@@ -67,17 +67,28 @@ exports.refresh = (req, res) => {
     let refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
         return res.status(401).json({ message: "Unauthorized" });
+    } else {
+        jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY, (err, decoded) => {
+            if (err) return res.sendStatus(401);
+            const user = User_DB.find(u => u.email === decoded.email);
+            if (!user) return res.sendStatus(401);
+
+            const accessToken = jwt.sign(
+                { email: user.email },
+                process.env.ACCESS_JWT_KEY,
+                { expiresIn: 120 } // 2 minutes
+            );
+            const newRefreshToken = jwt.sign(
+                { email: user.email, exp: Math.floor(Date.now() / 1000) + 2 * 24 * 60 * 60 },
+                process.env.REFRESH_JWT_KEY
+            );
+            // Envoie le token dans un cookie HTTPOnly pour 2 jours
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                sameSite: 'strict',
+                maxAge: 2 * 24 * 60 * 60 * 1000 // 2 jours
+            });
+            return res.status(200).json({ accessToken: accessToken });
+        });
     }
-
-    jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY, (err, decoded) => {
-        if (err) return res.sendStatus(401);
-        const user = User_DB.find(u => u.email === decoded.email);
-        if (!user) return res.sendStatus(401);
-
-        const accessToken = jwt.sign(
-            { email: user.email, exp: Math.floor(Date.now() / 1000) + 120 },
-            process.env.ACCESS_JWT_KEY
-        );
-        return res.status(200).json({ accessToken: accessToken });
-    });
 }
