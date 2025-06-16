@@ -1,41 +1,56 @@
-version: "3.9"
-
 services:
+  mongo:
+    image: mongo
+    restart : always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
   auth:
     build: ./backend/auth
-    ports:
-      - "5001:5000"
+    expose:
+      - "5000"
     env_file:
       - ./backend/auth/.env
-
-  feed:
-    build: ./backend/feed
-    ports:
-      - "5002:5000"
-    env_file:
-      - ./backend/feed/.env
+    networks:
+      - app-network
 
   tasks:
     build: ./backend/tasks
-    ports:
-      - "5003:5000"
+    expose:
+      - "5000"
     env_file:
       - ./backend/tasks/.env
-
-  gateway:
-    build: ./backend/gateway
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./backend/gateway/.env
-    depends_on:
-      - auth
-      - feed
-      - tasks
+    networks:
+      - app-network
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     depends_on:
-      - gateway
+      - nginx
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: gateway
+    volumes:
+      - ./backend/gateway/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth
+      - tasks
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  mongo_data:

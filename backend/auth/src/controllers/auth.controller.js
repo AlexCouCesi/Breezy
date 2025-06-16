@@ -3,9 +3,8 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-import User from '../models/user.model.js';
+import {User} from '../models/user.model.js';
 
-// Configurer nodemailer
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: +process.env.SMTP_PORT,

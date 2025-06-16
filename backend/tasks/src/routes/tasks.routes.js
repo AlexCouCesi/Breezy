@@ -1,13 +1,22 @@
-const express = require('express');
+import express from 'express';
+import { createTask, getAllTasks, getTaskById, updateTask, deleteTask } from '../controllers/tasks.controller.js';
+import requireFields from '../middlewares/requireFields.middleware.js';
+
 const router = express.Router();
 
-const tasksController = require('../controllers/tasks.controller.js');
-const requireFileds = require('../middlewares/requireFields.middleware.js');
+// Créer une tâche
+router.post('/', requireFields(['title', 'content']), createTask);
 
-router.post('/', requireFields(["title", "content"]), tasksController.createTask);
-router.get('/', tasksController.getAllTasks);
-router.get('/:id', tasksController.getTaskById);
-router.put('/:id', requireFileds(["title", "content", "completed"]), tasksController.updateTask);
-router.delete('/:id', tasksController.deleteTask);
+// Récupérer toutes les tâches
+router.get('/', getAllTasks);
 
-module.exports = router;
+// Récupérer une tâche par ID
+router.get('/:id', getTaskById);
+
+// Mettre à jour une tâche
+router.put('/:id', requireFields(['title', 'content']), updateTask);
+
+// Supprimer une tâche
+router.delete('/:id', deleteTask);
+
+export default router;

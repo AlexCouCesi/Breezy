@@ -1,28 +1,30 @@
-const express = require('express');
+import express from 'express';
+import mongoose from 'mongoose';
+import tasksRouter from './routes/tasks.routes.js';
+
 const app = express();
-const port = 3000;
-const mongoose = require('mongoose');
-require('dotenv').config();
+const port = process.env.PORT || 5000;
 
+// Middleware
 app.use(express.json());
-app.use('/api/tasks', require('./routes/tasks.routes.js'));
 
+// Routes
+app.use('/api/tasks', tasksRouter);
+
+// Test route
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Hello from tasks service!');
 });
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-});
-
+// Mongo connection + server start
 mongoose
-    .connect("mongodb://"+process.env.MONGO_HOST+":"+process.env.MONGO_PORT+"/"+process.env.MONGO_DATABASE_NAME)
+    .connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE_NAME}`)
     .then(() => {
-        console.log("Connected to MongoDB");
+        console.log('Connected to MongoDB');
         app.listen(port, () => {
-            console.log(`App listening on port ${port}`);
-        });
+        console.log(`Tasks service running at http://localhost:${port}`);});
     })
-    .catch(err => {
-        console.log(err);
+    .catch((err) => {
+    console.error('MongoDB connection failed:', err);
+    process.exit(1);
     });
