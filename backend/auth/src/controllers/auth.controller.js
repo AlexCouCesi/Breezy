@@ -5,22 +5,29 @@ const generateToken = (userId) => {
     return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
+const isStrongPassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&€#])[A-Za-z\d@$!%*?&€#]{8,}$/;
+    return regex.test(password);
+};
+
 export const register = async (req, res) => {
     try {
-        const { email, password, confirmPassword } = req.body;
+        const { email, password } = req.body;
 
-        if (!email || !password || !confirmPassword) {
-        return res.status(400).json({ error: "Tous les champs sont requis" });
+        // Vérifie les champs requis
+        if (!email || !password) {
+        return res.status(400).json({ error: "Email et mot de passe requis" });
         }
 
-        if (password !== confirmPassword) {
-        return res.status(400).json({ error: "Les mots de passe ne correspondent pas" });
+        // Vérifie la force du mot de passe
+        if (!isStrongPassword(password)) {
+        return res.status(400).json({
+            error:
+            "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.",
+        });
         }
 
-        if (password.length < 6) {
-        return res.status(400).json({ error: "Le mot de passe doit faire au moins 6 caractères" });
-        }
-
+        // Vérifie si l'utilisateur existe déjà
         const existingUser = await User.findOne({ email });
         if (existingUser) {
         return res.status(400).json({ error: "Email déjà utilisé" });
@@ -31,9 +38,11 @@ export const register = async (req, res) => {
 
         res.status(201).json({ token });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: "Erreur lors de l'inscription" });
     }
 };
+
 
 export const login = async (req, res) => {
     try {

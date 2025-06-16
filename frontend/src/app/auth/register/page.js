@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -17,11 +18,29 @@ export default function RegisterPage() {
 
     const handleRegister = async () => {
         setErrorMessage('');
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&€#])[A-Za-z\d@$!%*?&€#]{8,}$/;
+
+        if (!email || !password || !confirmPassword) {
+            setErrorMessage('Tous les champs sont obligatoires');
+            return;
+        }
+
+        if (!passwordRegex.test(password)) {
+            setErrorMessage(
+                "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+            );
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setErrorMessage('Les mots de passe ne correspondent pas');
+            return;
+        }
+
         try {
             const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
                 email,
                 password,
-                confirmPassword
             });
             router.push('/auth/login');
         } catch (error) {
@@ -62,7 +81,7 @@ export default function RegisterPage() {
                             type="email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
-                            placeholder="ex: nom@exemple.com"
+                            placeholder="nom@exemple.com"
                         />
                     </FormGroup>
                     <FormGroup label="Mot de passe">
@@ -70,15 +89,16 @@ export default function RegisterPage() {
                             type="password"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
-                            placeholder="Au moins 6 caractères"
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                        Au moins 8 caractères, avec majuscule, minuscule, chiffre et symbole.
+                        </p>
                     </FormGroup>
                     <FormGroup label="Confirmer le mot de passe">
                         <Input
                             type="password"
                             value={confirmPassword}
                             onChange={e => setConfirmPassword(e.target.value)}
-                            placeholder="Retaper le mot de passe"
                         />
                     </FormGroup>
                     <Button onClick={handleRegister} className="mt-6 w-full">

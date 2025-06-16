@@ -49,7 +49,7 @@ export default function LoginPage() {
             <FormGroup label="Courriel">
                 <Input
                 type="email"
-                placeholder="écrire ici"
+                placeholder="Votre courriel"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 />
@@ -57,7 +57,7 @@ export default function LoginPage() {
             <FormGroup label="Mot de passe">
                 <Input
                 type="password"
-                placeholder="écrire ici"
+                placeholder="Votre mot de passe"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 />
