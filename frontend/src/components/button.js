@@ -8,8 +8,9 @@ export default function Button({
     const base =
         "px-6 py-2 rounded-full font-medium text-white transition duration-200";
     const variants = {
-        primary: "bg-black hover:bg-zinc-800",          // bouton foncé
-        secondary: "bg-zinc-700 hover:bg-zinc-600",      // bouton gris
+        primary: "bg-zinc-800 hover:bg-zinc-700",
+        secondary: "bg-zinc-600 hover:bg-zinc-500",
+      // bouton gris
     };
 
     return (

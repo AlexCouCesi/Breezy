@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/button';
@@ -15,26 +16,34 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen">
+    <div className="flex flex-col md:flex-row h-screen bg-white">
       {/* Bloc logo à gauche */}
-      <div className="flex-1 flex items-center justify-center bg-gray-200">
+      <div className="flex-1 flex items-center justify-center bg-neutral-200">
         <div className="text-center">
           <Image
             src="/assets/logo_breezy.webp"
             alt="Logo Breezy"
-            width={120}
-            height={120}
-            className="mx-auto mb-4"
+            width={140}
+            height={140}
+            className="mx-auto"
           />
-          <p className="text-2xl font-light">Breezy</p>
         </div>
       </div>
 
-      {/* Bloc boutons à droite */}
-      <div className="flex-1 flex items-center justify-center bg-white">
-        <div className="flex flex-col gap-4 w-full max-w-xs">
-          <Button onClick={() => router.push('/auth/login')}>S'authentifier</Button>
-          <Button variant="secondary" onClick={() => router.push('/auth/register')}>
+      {/* Bloc actions à droite */}
+      <div className="flex-1 flex items-center justify-center bg-neutral-100">
+        <div className="flex flex-col gap-6 w-full max-w-xs">
+          <Button
+            className="w-full text-base py-3"
+            onClick={() => router.push('/auth/login')}
+          >
+            S'authentifier
+          </Button>
+          <Button
+            variant="secondary"
+            className="w-full text-base py-3"
+            onClick={() => router.push('/auth/register')}
+          >
             Créer un compte
           </Button>
         </div>
