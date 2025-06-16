@@ -20,8 +20,9 @@
 | Fx10 | Profil utilisateur (photo, bio)                                | Utilisateur            |
 | Fx17 | Messagerie privée entre utilisateurs                           | Utilisateur            |
 
-**Fonctionnalités secondaires (optionnelles) :**  
-- Ajout de tags aux messages & recherche par tags (Fx12, Fx13)  
+**Fonctionnalités secondaires (optionnelles) :**
+
+- Ajout de tags aux messages & recherche par tags (Fx12, Fx13)
 - Notifications (mentions, likes, nouveaux followers) (Fx14, Fx16)  
 - Upload d’images et de vidéos (Fx18, Fx19)  
 - Signalement de contenu inapproprié (Fx20)  
@@ -62,22 +63,26 @@
 
 ## Installation & démarrage
 
-1. Clonez le dépôt :  
+1. Clonez le dépôt :
+
    ```bash
    git clone https://github.com/votre-org/breezy.git
    cd breezy
 
 2. Démarrez les services Docker :
+
    ```bash
    docker-compose up --build
 
 3. Front-end :
+
    ```bash
    cd frontend
    npm install
    npm run dev
 
 4. Back-end :
+
    ```bash
    cd backend
    npm install
@@ -85,4 +90,4 @@
 
 5. Accès à l'application :
 
-Accédez à l'application sur http://localhost:3000
+Accédez à l'application sur <http://localhost:3000>

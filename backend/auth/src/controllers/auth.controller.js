@@ -1,103 +1,54 @@
-import { validationResult } from 'express-validator';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
-import {User} from '../models/user.model.js';
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: +process.env.SMTP_PORT,
-    auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-    }
-});
+const generateToken = (userId) => {
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
 
-const register = async (req, res, next) => {
-  // 1. Validation des champs
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { username, email, password } = req.body;
-
+export const register = async (req, res) => {
     try {
-    // 2. Vérifier l’unicité
-    if (await User.findOne({ email })) {
-        return res.status(409).json({ message: 'Email déjà utilisé' });
-    }
+        const { email, password, confirmPassword } = req.body;
 
-    // 3. Hash du mot de passe
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+        if (!email || !password || !confirmPassword) {
+        return res.status(400).json({ error: "Tous les champs sont requis" });
+        }
 
-    // 4. Générer un token de vérification
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+        if (password !== confirmPassword) {
+        return res.status(400).json({ error: "Les mots de passe ne correspondent pas" });
+        }
 
-    // 5. Créer l’utilisateur
-    const user = await User.create({
-        username,
-        email,
-        passwordHash,
-        verificationToken
-    });
+        if (password.length < 6) {
+        return res.status(400).json({ error: "Le mot de passe doit faire au moins 6 caractères" });
+        }
 
-    // 6. Envoyer l’email de confirmation
-    const confirmUrl = `${process.env.CLIENT_URL}/auth/verify/${verificationToken}`;
-    await transporter.sendMail({
-        from: `"Breezy" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: 'Vérifiez votre adresse email',
-        html: `
-        <h1>Bonjour ${username}</h1>
-        <p>Cliquez <a href="${confirmUrl}">ici</a> pour confirmer votre adresse email.</p>
-        `
-    });
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+        return res.status(400).json({ error: "Email déjà utilisé" });
+        }
 
-    res.status(201).json({ message: 'Inscription réussie, merci de confirmer votre email.' });
+        const newUser = await User.create({ email, password });
+        const token = generateToken(newUser._id);
+
+        res.status(201).json({ token });
     } catch (err) {
-    next(err);
+        res.status(500).json({ error: "Erreur lors de l'inscription" });
     }
 };
 
-const verifyEmail = async (req, res, next) => {
-    const { token } = req.params;
+export const login = async (req, res) => {
     try {
-    const user = await User.findOne({ verificationToken: token });
-    if (!user) {
-        return res.status(400).json({ message: 'Token invalide ou expiré' });
-    }
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    await user.save();
-    res.json({ message: 'Email vérifié, vous pouvez vous connecter.' });
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user || !(await user.comparePassword(password))) {
+        return res.status(401).json({ error: 'Identifiants invalides' });
+        }
+        const token = generateToken(user._id);
+        res.status(200).json({ token });
     } catch (err) {
-    next(err);
+        res.status(500).json({ error: 'Erreur lors de la connexion' });
     }
+    };
+
+    export const verifyEmail = (req, res) => {
+    res.status(200).json({ message: "Email vérifié" });
 };
-
-const login = async (req, res, next) => {
-    const { email, password } = req.body;
-    try {
-    // 1. Trouver l’utilisateur
-    const user = await User.findOne({ email });
-    if (!user || !await user.comparePassword(password)) {
-        return res.status(401).json({ message: 'Email ou mot de passe incorrect' });
-    }
-    // 2. Vérifier l’email
-    if (!user.isVerified) {
-        return res.status(403).json({ message: 'Veuillez vérifier votre adresse email' });
-    }
-    // 3. Générer un JWT
-    const payload = { sub: user._id, role: user.role || 'USER' };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
-    } catch (err) {
-    next(err);
-    }
-};
-
-export { register, verifyEmail, login };

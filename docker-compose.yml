@@ -11,6 +11,8 @@ services:
 
   auth:
     build: ./backend/auth
+    ports:
+      - "5001:5000"
     expose:
       - "5000"
     env_file:

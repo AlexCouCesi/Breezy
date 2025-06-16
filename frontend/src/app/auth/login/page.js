@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import Button from '@/components/button';
 import { Card } from '@/components/card';
 import { Input } from '@/components/input';
 import FormGroup from '@/components/formgroup';
+import Image from 'next/image';
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const router = useRouter();
 
     const handleLogin = async () => {
@@ -19,30 +20,38 @@ export default function LoginPage() {
             email,
             password,
         });
-        localStorage.setItem("token", res.data.token);
-        router.push("/feed");
+        localStorage.setItem('token', res.data.token);
+        router.push('/feed');
         } catch {
-        alert("Erreur de connexion");
+        alert('Erreur de connexion');
         }
     };
 
     return (
         <div className="flex h-screen">
-        {/* Partie gauche avec logo */}
-        <div className="w-1/2 bg-gray-300 flex flex-col justify-center items-center">
-            <h1 className="text-4xl font-light mb-2">logo</h1>
-            <p className="text-lg font-medium">🌬️ Breezy</p>
+        {/* Bloc logo */}
+        <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
+            <div className="text-center">
+            <Image
+                src="/assets/logo_breezy.webp"
+                alt="Logo Breezy"
+                width={100}
+                height={100}
+                className="mx-auto mb-2"
+            />
+            <p className="text-xl text-black">Breezy</p>
+            </div>
         </div>
 
-        {/* Partie droite avec formulaire */}
-        <div className="w-1/2 bg-gray-200 flex justify-center items-center">
-            <Card className="w-full max-w-sm space-y-6">
+        {/* Bloc formulaire */}
+        <div className="w-1/2 bg-neutral-300 flex items-center justify-center px-4">
+            <Card className="w-full max-w-md">
             <FormGroup label="Courriel">
                 <Input
                 type="email"
                 placeholder="écrire ici"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 />
             </FormGroup>
             <FormGroup label="Mot de passe">
@@ -50,10 +59,12 @@ export default function LoginPage() {
                 type="password"
                 placeholder="écrire ici"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 />
             </FormGroup>
-            <Button onClick={handleLogin}>Se connecter</Button>
+            <Button onClick={handleLogin} className="mt-6 w-full">
+                Se connecter
+            </Button>
             </Card>
         </div>
         </div>
