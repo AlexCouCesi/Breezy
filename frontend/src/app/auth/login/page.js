@@ -1,18 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
+import axios from 'axios';
+import Button from '@/components/button';
+import { Card } from '@/components/card';
+import { Input } from '@/components/input';
+import FormGroup from '@/components/formgroup';
+import Image from 'next/image';
+import Cookies from 'js-cookie'; 
 
 export default function LoginPage() {
-    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+    const router = useRouter();
+
+    const handleLogin = async () => {
         try {
             const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
             Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
@@ -21,61 +24,51 @@ export default function LoginPage() {
             } else {
                 router.push('/feed');
             }
-        } catch (err) {
-            setError(err.response?.data?.message || 'Erreur de connexion');
+        } catch(error) {
+            alert('Erreur de connexion : ' + error);
         }
     };
 
     return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
-        >
-        <h1 className="text-2xl font-bold mb-6 text-center">Connexion</h1>
-
-        {error && (
-            <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
-            {error}
+        <div className="flex h-screen">
+        {/* Bloc logo */}
+        <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
+            <div className="text-center">
+            <Image
+                src="/assets/logo_breezy.webp"
+                alt="Logo Breezy"
+                width={100}
+                height={100}
+                className="mx-auto mb-2"
+            />
+            <p className="text-xl text-black">Breezy</p>
             </div>
-        )}
+        </div>
 
-        <label className="block mb-2">
-            <span className="text-gray-700">Email</span>
-            <input
-            type="email"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            />
-        </label>
-
-        <label className="block mb-4">
-            <span className="text-gray-700">Mot de passe</span>
-            <input
-            type="password"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            />
-        </label>
-
-        <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-        >
-            Se connecter
-        </button>
-
-        <p className="mt-4 text-center text-sm">
-            Pas encore de compte ?{' '}
-            <a href="/auth/register" className="text-blue-600 hover:underline">
-            Inscrivez-vous
-            </a>
-        </p>
-        </form>
-    </div>
+        {/* Bloc formulaire */}
+        <div className="w-1/2 bg-neutral-300 flex items-center justify-center px-4">
+            <Card className="w-full max-w-md">
+            <FormGroup label="Courriel">
+                <Input
+                type="email"
+                placeholder="écrire ici"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                />
+            </FormGroup>
+            <FormGroup label="Mot de passe">
+                <Input
+                type="password"
+                placeholder="écrire ici"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                />
+            </FormGroup>
+            <Button onClick={handleLogin} className="mt-6 w-full">
+                Se connecter
+            </Button>
+            </Card>
+        </div>
+        </div>
     );
 }

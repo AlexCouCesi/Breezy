@@ -1,11 +1,37 @@
 'use client';
-
 import { useState } from 'react';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import Button from '@/components/button';
+import { Card } from '@/components/card';
+import { Input } from '@/components/input';
+import { FormGroup } from '@/components/formgroup';
+import Image from 'next/image';
 
 export default function RegisterPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
+
+    const handleRegister = async () => {
+        setErrorMessage('');
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/register`, {
+                email,
+                password,
+                confirmPassword
+            });
+            router.push('/auth/login');
+        } catch (error) {
+            if (error.response?.data?.error) {
+                setErrorMessage(error.response.data.error);
+            } else {
+                setErrorMessage('Une erreur est survenue');
+            }
+        }
+    };
     const [form, setForm] = useState({
     username: '',
     email: '',
@@ -37,81 +63,58 @@ export default function RegisterPage() {
     };
 
     return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md"
-        >
-        <h1 className="text-2xl font-bold mb-6 text-center">Inscription</h1>
-
-        {error && (
-            <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
-            {error}
+        <div className="flex flex-col md:flex-row h-screen">
+            {/* Bloc logo */}
+            <div className="flex-1 flex items-center justify-center bg-neutral-300">
+                <div className="text-center">
+                    <Image
+                        src="/assets/logo_breezy.webp"
+                        alt="Logo Breezy"
+                        width={100}
+                        height={100}
+                        className="mx-auto mb-2"
+                    />
+                    <p className="text-xl text-black">Breezy</p>
+                </div>
             </div>
-        )}
 
-        <label className="block mb-2">
-            <span className="text-gray-700">Nom d’utilisateur</span>
-            <input
-            type="text"
-            name="username"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={form.username}
-            onChange={handleChange}
-            required
-            />
-        </label>
-
-        <label className="block mb-2">
-            <span className="text-gray-700">Email</span>
-            <input
-            type="email"
-            name="email"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={form.email}
-            onChange={handleChange}
-            required
-            />
-        </label>
-
-        <label className="block mb-2">
-            <span className="text-gray-700">Mot de passe</span>
-            <input
-            type="password"
-            name="password"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={form.password}
-            onChange={handleChange}
-            required
-            />
-        </label>
-
-        <label className="block mb-4">
-            <span className="text-gray-700">Confirmer mot de passe</span>
-            <input
-            type="password"
-            name="confirmPassword"
-            className="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            required
-            />
-        </label>
-
-        <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
-            S’inscrire
-        </button>
-
-        <p className="mt-4 text-center text-sm">
-            Déjà un compte ?{' '}
-            <a href="/auth/login" className="text-blue-600 hover:underline">
-            Connectez-vous
-            </a>
-        </p>
-        </form>
-    </div>
+            {/* Bloc formulaire */}
+            <div className="flex-1 flex items-center justify-center bg-neutral-300 px-4">
+                <Card className="w-full max-w-md">
+                    {errorMessage && (
+                        <div className="mb-4 text-red-600 text-sm text-center">
+                            {errorMessage}
+                        </div>
+                    )}
+                    <FormGroup label="Courriel">
+                        <Input
+                            type="email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            placeholder="ex: nom@exemple.com"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Mot de passe">
+                        <Input
+                            type="password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            placeholder="Au moins 6 caractères"
+                        />
+                    </FormGroup>
+                    <FormGroup label="Confirmer le mot de passe">
+                        <Input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
+                            placeholder="Retaper le mot de passe"
+                        />
+                    </FormGroup>
+                    <Button onClick={handleRegister} className="mt-6 w-full">
+                        Créer mon compte
+                    </Button>
+                </Card>
+            </div>
+        </div>
     );
 }

@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require("../models/user.model");
 const User_DB = [];
+// Make sure to use cookie-parser in your main app file (e.g., app.js or server.js):
+// const cookieParser = require('cookie-parser');
+// app.use(cookieParser());
 
 exports.register = (req, res) => {
     var newUser = new User(req.body.username, req.body.email, bcrypt.hashSync(req.body.password, 10));

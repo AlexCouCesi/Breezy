@@ -1,24 +1,53 @@
-// frontend/src/app/page.js
-import Link from 'next/link'
+'use client';
 
-export default function HomePage() {
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Button from '@/components/button';
+import Image from 'next/image';
+
+export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/feed');
+    }
+  }, [router]);
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-      <h1 className="text-4xl font-bold mb-8">Bienvenue sur Breezy</h1>
-      <div className="space-x-4">
-        <Link
-          href="/auth/login"
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Se connecter
-        </Link>
-        <Link
-          href="/auth/register"
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-        >
-          Créer un compte
-        </Link>
+    <div className="flex flex-col md:flex-row h-screen bg-white">
+      {/* Bloc logo à gauche */}
+      <div className="flex-1 flex items-center justify-center bg-neutral-200">
+        <div className="text-center">
+          <Image
+            src="/assets/logo_breezy.webp"
+            alt="Logo Breezy"
+            width={140}
+            height={140}
+            className="mx-auto"
+          />
+        </div>
       </div>
-    </main>
-  )
+
+      {/* Bloc actions à droite */}
+      <div className="flex-1 flex items-center justify-center bg-neutral-100">
+        <div className="flex flex-col gap-6 w-full max-w-xs">
+          <Button
+            className="w-full text-base py-3"
+            onClick={() => router.push('/auth/login')}
+          >
+            S'authentifier
+          </Button>
+          <Button
+            variant="secondary"
+            className="w-full text-base py-3"
+            onClick={() => router.push('/auth/register')}
+          >
+            Créer un compte
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
