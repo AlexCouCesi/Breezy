@@ -1,8 +1,12 @@
-import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
+import User from '../models/user.model.js';
 
-const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const generateAccessToken = (userId, email) => {
+    return jwt.sign({ id: userId, email }, process.env.ACCESS_JWT_KEY, { expiresIn: '2m' });
+};
+
+const generateRefreshToken = (email) => {
+    return jwt.sign({ email }, process.env.REFRESH_JWT_KEY, { expiresIn: '2d' });
 };
 
 const isStrongPassword = (password) => {
@@ -12,52 +16,101 @@ const isStrongPassword = (password) => {
 
 export const register = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, email, password } = req.body;
 
-        // Vérifie les champs requis
-        if (!email || !password) {
-        return res.status(400).json({ error: "Email et mot de passe requis" });
-        }
+        if (!username || !email || !password)
+            return res.status(400).json({ error: "Champs requis manquants" });
 
-        // Vérifie la force du mot de passe
-        if (!isStrongPassword(password)) {
-        return res.status(400).json({
-            error:
-            "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.",
-        });
-        }
+        if (!isStrongPassword(password))
+            return res.status(400).json({
+                error: "Mot de passe trop faible (8+ caractères, majuscule, chiffre, symbole)"
+            });
 
-        // Vérifie si l'utilisateur existe déjà
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
-        return res.status(400).json({ error: "Email déjà utilisé" });
-        }
+        if (existingUser)
+            return res.status(400).json({ error: "Email déjà utilisé" });
 
-        const newUser = await User.create({ email, password });
-        const token = generateToken(newUser._id);
-
-        res.status(201).json({ token });
+        const newUser = await User.create({ username, email, password });
+        return res.status(201).json({ message: "Utilisateur créé !" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Erreur lors de l'inscription" });
     }
 };
 
-
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        if (!user || !(await user.comparePassword(password))) {
-        return res.status(401).json({ error: 'Identifiants invalides' });
-        }
-        const token = generateToken(user._id);
-        res.status(200).json({ token });
-    } catch (err) {
-        res.status(500).json({ error: 'Erreur lors de la connexion' });
-    }
-    };
+        if (!user || !(await user.comparePassword(password)))
+            return res.status(401).json({ error: "Identifiants invalides" });
 
-    export const verifyEmail = (req, res) => {
+        const accessToken = generateAccessToken(user._id, user.email);
+        const refreshToken = generateRefreshToken(user.email);
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 2 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({ accessToken });
+    } catch (err) {
+        res.status(500).json({ error: "Erreur lors de la connexion" });
+    }
+};
+
+export const authenticate = async (req, res) => {
+    let token;
+    const authHeader = req.headers["authorization"];
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+    } else if (req.cookies?.accessToken) {
+        token = req.cookies.accessToken;
+    }
+
+    if (!token)
+        return res.status(401).json({ message: "Non autorisé" });
+
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_JWT_KEY);
+        const user = await User.findOne({ email: decoded.email });
+        if (!user) return res.status(401).json({ message: "Utilisateur introuvable" });
+
+        res.sendStatus(200);
+    } catch (err) {
+        if (err.name === 'TokenExpiredError')
+            return res.status(401).json({ message: "Token expiré" });
+
+        return res.status(401).json({ message: "Token invalide" });
+    }
+};
+
+export const refresh = async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken)
+        return res.status(401).json({ message: "Non autorisé" });
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY);
+        const user = await User.findOne({ email: decoded.email });
+        if (!user) return res.sendStatus(401);
+
+        const newAccessToken = generateAccessToken(user._id, user.email);
+        const newRefreshToken = generateRefreshToken(user.email);
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 2 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({ accessToken: newAccessToken });
+    } catch {
+        res.sendStatus(401);
+    }
+};
+
+export const verifyEmail = (req, res) => {
     res.status(200).json({ message: "Email vérifié" });
 };

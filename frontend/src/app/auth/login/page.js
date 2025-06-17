@@ -17,7 +17,7 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         try {
-            const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
+            const res = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/login', { email, password });
             Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
             if (router.pathname === '/feed') {
                 router.refresh();
