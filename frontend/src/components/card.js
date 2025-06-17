@@ -1,5 +1,7 @@
+'use client';
+
 export function Card({ children }) {
     return (
-        <div className="bg-white rounded shadow-card p-6">{children}</div>
+        <div className="bg-white rounded-xl shadow-md p-6">{children}</div>
     );
 }

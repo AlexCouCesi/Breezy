@@ -31,44 +31,53 @@ export default function LoginPage() {
 
     return (
         <div className="flex h-screen">
-        {/* Bloc logo */}
-        <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
-            <div className="text-center">
-            <Image
-                src="/assets/logo_breezy.webp"
-                alt="Logo Breezy"
-                width={100}
-                height={100}
-                className="mx-auto mb-2"
-            />
-            <p className="text-xl text-black">Breezy</p>
+            {/* Bloc logo */}
+            <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
+                <div className="text-center">
+                <Image
+                    src="/assets/logo_breezy.webp"
+                    alt="Logo Breezy"
+                    width={100}
+                    height={100}
+                    className="mx-auto mb-2"
+                />
+                <p className="text-xl text-black">Breezy</p>
+                </div>
             </div>
-        </div>
 
-        {/* Bloc formulaire */}
-        <div className="w-1/2 bg-neutral-300 flex items-center justify-center px-4">
-            <Card className="w-full max-w-md">
-            <FormGroup label="Courriel">
-                <Input
-                type="email"
-                placeholder="écrire ici"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                />
-            </FormGroup>
-            <FormGroup label="Mot de passe">
-                <Input
-                type="password"
-                placeholder="écrire ici"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                />
-            </FormGroup>
-            <Button onClick={handleLogin} className="mt-6 w-full">
-                Se connecter
-            </Button>
-            </Card>
-        </div>
+            {/* Bloc formulaire */}
+            <div className="w-1/2 bg-neutral-300 flex items-center justify-center px-4">
+                <Card className="w-full max-w-md">
+                <FormGroup label="Courriel">
+                    <Input
+                    type="email"
+                    placeholder="Votre courriel"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    />
+                </FormGroup>
+                <FormGroup label="Mot de passe">
+                    <Input
+                    type="password"
+                    placeholder="Votre mot de passe"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    />
+                </FormGroup>
+                <Button onClick={handleLogin} className="mt-6 w-full">
+                    Se connecter
+                </Button>
+                <p className="mt-4 text-center text-sm text-zinc-600">
+                    Pas encore de compte ?{' '}
+                    <span
+                        onClick={() => router.push('/auth/register')}
+                        className="text-blue-600 hover:underline cursor-pointer"
+                    >
+                        Créer un compte
+                    </span>
+                </p>
+                </Card>
+            </div>
         </div>
     );
 }
