@@ -104,6 +104,15 @@ export default function RegisterPage() {
                     <Button onClick={handleRegister} className="mt-6 w-full">
                         Créer mon compte
                     </Button>
+                    <p className="mt-4 text-center text-sm text-zinc-600">
+                        Déjà un compte ?{' '}
+                        <span
+                            onClick={() => router.push('/auth/login')}
+                            className="text-blue-600 hover:underline cursor-pointer"
+                        >
+                            Se connecter
+                        </span>
+                    </p>
                 </Card>
             </div>
         </div>
