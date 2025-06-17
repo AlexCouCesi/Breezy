@@ -69,31 +69,48 @@
    git clone https://github.com/votre-org/breezy.git
    cd breezy
 
-2. Démarrez les services Docker :
+2. Installer les dépendances npm
+
+   ```bash
+      cd backend
+      npm install
+      cd auth
+      npm install
+      cd ..
+      cd tasks
+      npm install
+      cd ..
+      cd ..
+      cd frontend
+      npm install
+      cd ..
+
+3. Démarrez les services Docker :
 
    ```bash
    docker-compose up --build
 
-3. Front-end :
+4. Front-end :
 
    ```bash
    cd frontend
    npm install
    npm run dev
 
-4. Back-end :
+5. Back-end :
 
    ```bash
    cd backend
    npm install
    npm run dev
 
-5. Service d'authentification
+6. Service d'authentification
+
    ```bash
    cd auth
    npm install
    npm run dev
 
-6. Accès à l'application :
+7. Accès à l'application :
 
-Accédez à l'application sur <http://localhost:3000>
+Accédez à l'application sur <http://localhost:8080>
