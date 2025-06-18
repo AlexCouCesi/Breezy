@@ -23,7 +23,6 @@ services:
     container_name: gateway
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./backend/gateway/nginx.conf:/etc/nginx/nginx.con
     ports:
       - "8080:8080"
     depends_on:

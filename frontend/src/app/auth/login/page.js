@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Button from '@/components/button';
@@ -19,15 +19,31 @@ export default function LoginPage() {
         try {
             const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/login', { email, password });
             Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
-            if (router.pathname === '/feed') {
-                router.refresh();
-            } else {
-                router.push('/feed');
-            }
+            router.push('/feed');
+            router.refresh();
         } catch(error) {
             alert('Erreur de connexion : ' + error);
         }
     };
+
+    // on teste d'abord si on peut récupérer l'accessToke à partir de notre refreshToken
+    console.log('Checking for refresh token...' + Cookies.get('refreshToken'));
+    useEffect(() => {
+        fetch('/api/auth/refresh', {
+                    method: 'GET',
+                    credentials: 'include',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle response if needed
+                        Cookies.set('accessToken', data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
+                        router.push('/feed');
+                        router.refresh();
+                    })
+                    .catch(error => {
+                        console.error('Error refreshing token:', error);
+                    });
+    }, [router]);
 
     return (
         <div className="flex h-screen">
