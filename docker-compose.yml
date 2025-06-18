@@ -24,7 +24,7 @@ services:
     expose:
       - "4000"
     env_file:
-      - ./backend/auth/.env
+      - ./backend/.env
     networks:
       - breezy-net
 

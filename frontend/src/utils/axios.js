@@ -8,13 +8,13 @@ const api = axios.create({
 
 // Intercepteur de réponse pour gérer le refresh token
 api.interceptors.response.use(
-  response => response,
+  response => response,  
   async error => {
     const originalRequest = error.config;
     // Si le token est expiré ou invalide et qu'on n'a pas déjà tenté un refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      try {
+      try {      
         // Appel à /refresh pour obtenir un nouveau accessToken
         const res = await axios.post(
           process.env.NEXT_PUBLIC_AUTH_URL + '/api/auth/refresh',

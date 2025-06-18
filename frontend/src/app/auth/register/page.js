@@ -40,7 +40,7 @@ export default function RegisterPage() {
         }
 
         try {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
             username,
             email,
             password,
