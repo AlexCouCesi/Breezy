@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 export default function SideMenu() {
     const handleLogout = () => {
         Cookies.remove('accessToken');
+        fetch('/api/auth/logout', { method: 'GET' });
         window.location.href = '/';
     };
 

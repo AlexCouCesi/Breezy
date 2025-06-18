@@ -128,3 +128,8 @@ export const me = async (req, res) => {
 export const verifyEmail = (req, res) => {
     res.status(200).json({ message: "Email vérifié" });
 };
+
+export const logout = (req, res) => {
+    res.clearCookie('refreshToken');
+    res.status(200).json({ message: "Déconnexion réussie" });
+};  
