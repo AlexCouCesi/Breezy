@@ -85,4 +85,4 @@
 
 5. Accès à l'application :
 
-Accédez à l'application sur http://localhost:3000
+Accédez à l'application sur http://localhost:8080
