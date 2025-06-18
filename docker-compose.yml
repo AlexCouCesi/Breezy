@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo
-    restart : always
+    restart: always
     ports:
       - "27017:27017"
     volumes:
@@ -18,36 +18,38 @@ services:
     networks:
       - breezy-net
 
-  nginx:
-    image: nginx:latest
-    container_name: gateway
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "8080:8080"
-    depends_on:
-      - auth
-      - tasks
+  auth:
+    build: ./backend/auth
+    container_name: auth
+    expose:
+      - "4000"
+    env_file:
+      - ./backend/.env
     networks:
       - breezy-net
 
   frontend:
     build: ./frontend
     container_name: frontend
+    expose:
+      - "3000"
     depends_on:
-      - nginx
+      - auth
+      - tasks
     networks:
       - breezy-net
 
-  backend:
-    build: ./backend
-    container_name: backend
-    networks:
-      - breezy-net
-
-  auth:
-    build: ./auth
-    container_name: auth
+  nginx:
+    image: nginx:latest
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/gateway/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - auth
+      - tasks
+      - frontend
     networks:
       - breezy-net
 
