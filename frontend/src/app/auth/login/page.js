@@ -23,6 +23,7 @@ export default function LoginPage() {
                 router.refresh();
             } else {
                 router.push('/feed');
+                window.location.href = '/feed';
             }
         } catch(error) {
             alert('Erreur de connexion : ' + error);

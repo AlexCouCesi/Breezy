@@ -111,6 +111,20 @@ export const refresh = async (req, res) => {
     }
 };
 
+export const me = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('username email avatar');
+        if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+        res.status(200).json({
+        username: user.username,
+        email: user.email,
+        avatar: user.avatar || '' // ou '/assets/default-avatar-white.png'
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Erreur serveur' });
+    }
+};
+
 export const verifyEmail = (req, res) => {
     res.status(200).json({ message: "Email vérifié" });
 };
