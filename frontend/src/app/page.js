@@ -8,13 +8,13 @@ import Image from 'next/image';
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
+  /*useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       router.push('/feed');
     }
   }, [router]);
-
+  */
   return (
     <div className="min-h-screen flex">
       {/* Section gauche - Branding avec logo Breezy */}

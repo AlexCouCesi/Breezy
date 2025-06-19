@@ -7,93 +7,100 @@ import Button from '@/components/button';
 import { Card } from '@/components/card';
 import { Input } from '@/components/input';
 import FormGroup from '@/components/formgroup';
-import Image from 'next/image';
-import Cookies from 'js-cookie'; 
-
-
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(true); // État pour gérer le chargement initial
     const router = useRouter();
 
+    // Fonction pour gérer la connexion utilisateur via le formulaire
     const handleLogin = async () => {
         try {
             const res = await axios.post(process.env.NEXT_PUBLIC_AUTH_URL + '/login', { email, password });
-            Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
-            router.push('/feed');
-            router.refresh();
+            
+            if (res.data?.accessToken) {
+                Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true });
+                router.push('/feed');
+                router.refresh();
+            } else {
+                alert('Échec de connexion : Token manquant');
+            }
         } catch(error) {
-            alert('Erreur de connexion : ' + error);
+            alert('Erreur de connexion : ' + error.response?.data?.message || error.message);
         }
     };
 
-    // on teste d'abord si on peut récupérer l'accessToke à partir de notre refreshToken
-    console.log('Checking for refresh token...' + Cookies.get('refreshToken'));
+    // Vérification automatique du refreshToken au montage de la page
     useEffect(() => {
-        fetch('/api/auth/refresh', {
+        const checkRefreshToken = async () => {
+            try {
+                const response = await fetch('/api/auth/refresh', {
                     method: 'GET',
                     credentials: 'include',
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Handle response if needed
-                        Cookies.set('accessToken', data.accessToken, { expires: 1, secure: true }); // Store token in a cookie
-                        router.push('/feed');
-                        router.refresh();
-                    })
-                    .catch(error => {
-                        console.error('Error refreshing token:', error);
-                    });
+                });
+                const data = await response.json();
+
+                if (data?.accessToken) {
+                    Cookies.set('accessToken', data.accessToken, { expires: 1, secure: true });
+                    router.push('/feed');
+                    router.refresh();
+                } else {
+                    // Aucun token valide : on arrête le loading et on reste sur la page login
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error('Erreur lors du rafraîchissement du token :', error);
+                setLoading(false);
+            }
+        };
+
+        checkRefreshToken();
     }, [router]);
 
-    return (
-        <div className="flex h-screen">
-            {/* Bloc logo */}
-            <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
-                <div className="text-center">
-                <Image
-                    src="/assets/logo_breezy_v2.webp"
-                    alt="Logo Breezy"
-                    width={100}
-                    height={100}
-                    className="mx-auto mb-2"
-                />
-                <p className="text-xl text-black">Breezy</p>
-                </div>
+    // Affichage d'un écran de chargement pendant la vérification du token
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-white text-xl">Chargement...</p>
             </div>
+        );
+    }
 
-            {/* Bloc formulaire */}
-            <div className="w-1/2 bg-neutral-300 flex items-center justify-center px-4">
+    // Rendu normal de la page de connexion après vérification
+    return (
+        <div className="flex items-center justify-center h-screen bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 px-4">
+            <div className="flex justify-center items-center w-full max-w-5xl">
                 <Card className="w-full max-w-md">
-                <FormGroup label="Courriel">
-                    <Input
-                    type="email"
-                    placeholder="Votre courriel"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    />
-                </FormGroup>
-                <FormGroup label="Mot de passe">
-                    <Input
-                    type="password"
-                    placeholder="Votre mot de passe"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    />
-                </FormGroup>
-                <Button onClick={handleLogin} className="mt-6 w-full">
-                    Se connecter
-                </Button>
-                <p className="mt-4 text-center text-sm text-zinc-600">
-                    Pas encore de compte ?{' '}
-                    <span
-                        onClick={() => router.push('/auth/register')}
-                        className="text-blue-600 hover:underline cursor-pointer"
-                    >
-                        Créer un compte
-                    </span>
-                </p>
+                    <FormGroup label="Courriel">
+                        <Input
+                            type="email"
+                            placeholder="Votre courriel"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                        />
+                    </FormGroup>
+                    <FormGroup label="Mot de passe">
+                        <Input
+                            type="password"
+                            placeholder="Votre mot de passe"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                    </FormGroup>
+                    <Button onClick={handleLogin} className="mt-6 w-full">
+                        Se connecter
+                    </Button>
+                    <p className="mt-4 text-center text-sm text-zinc-600">
+                        Pas encore de compte ?{' '}
+                        <span
+                            onClick={() => router.push('/auth/register')}
+                            className="text-blue-600 hover:underline cursor-pointer"
+                        >
+                            Créer un compte
+                        </span>
+                    </p>
                 </Card>
             </div>
         </div>
