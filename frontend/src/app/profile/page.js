@@ -16,7 +16,9 @@ export default function Profile() {
 
     return (
         <div>
+            <h1 className="text-xl font-bold mb-4">Notifications</h1>
             <p>Connected.</p>
         </div>
     );
 }
+

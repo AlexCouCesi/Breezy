@@ -32,7 +32,7 @@ export default function Home() {
             <div className="space-y-6">
               <div className="relative">
                 <Image
-                  src="/assets/logo_breezy_v2.webp"
+                  src="/assets/logo_breezy_v2_writeless.webp"
                   alt="Logo Breezy"
                   width={160}
                   height={160}
@@ -129,7 +129,7 @@ export default function Home() {
           {/* Version mobile - Logo */}
           <div className="lg:hidden text-center mt-8">
             <Image
-              src="/assets/logo_breezy.webp"
+              src="/assets/logo_breezy_writeless.webp"
               alt="Logo Breezy"
               width={80}
               height={80}

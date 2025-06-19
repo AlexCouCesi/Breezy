@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
+import Image from 'next/image';
+
 
 export default function SideMenu() {
     const handleLogout = () => {
@@ -25,10 +27,42 @@ export default function SideMenu() {
 
             {/* Liens de navigation */}
             <div className="flex flex-col gap-10 mt-30 text-zinc-700 text-sm font-medium">
-                <Link href="/feed" className="hover:text-zinc-900">Page d'accueil</Link>
-                <Link href="/profile" className="hover:text-zinc-900">Profil</Link>
-                <Link href="/notifications" className="hover:text-zinc-900">Notifications</Link>
-                <Link href="/messages" className="hover:text-zinc-900">Messages</Link>
+                <Link href="/feed" className="hover:text-zinc-900 flex items-center gap-2">
+                    <Image
+                        src="/assets/icones_nav/home_icon.png"
+                        alt="Accueil"
+                        width={20}
+                        height={20}
+                    />
+                    Page d'accueil
+                </Link>
+                                <Link href="/profile" className="hover:text-zinc-900 flex items-center gap-2">
+                    <Image
+                        src="/assets/icones_nav/user_icon.png"
+                        alt="Profil"
+                        width={20}
+                        height={20}
+                    />
+                    Profil
+                </Link>
+                <Link href="/notifications" className="hover:text-zinc-900 flex items-center gap-2">
+                    <Image
+                        src="/assets/icones_nav/bell_icon.png"
+                        alt="Notifications"
+                        width={20}
+                        height={20}
+                    />
+                    Notifications
+                </Link>
+                <Link href="/messages" className="hover:text-zinc-900 flex items-center gap-2">
+                    <Image
+                        src="/assets/icones_nav/mail_icon.png"
+                        alt="Messages"
+                        width={20}
+                        height={20}
+                    />
+                    Messages
+                </Link>
             </div>
 
             {/* Déconnexion alignée en bas */}
@@ -41,7 +75,5 @@ export default function SideMenu() {
                 </button>
             </div>
         </aside>
-
-
     );
 }
