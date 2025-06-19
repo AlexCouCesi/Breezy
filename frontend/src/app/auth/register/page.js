@@ -18,6 +18,7 @@ export default function RegisterPage() {
     const router = useRouter();
 
     const handleRegister = async () => {
+
         setErrorMessage('');
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&€#])[A-Za-z\d@$!%*?&€#]{8,}$/;
