@@ -51,7 +51,7 @@ export default function LoginPage() {
             <div className="w-1/2 bg-neutral-300 flex items-center justify-center">
                 <div className="text-center">
                 <Image
-                    src="/assets/logo_breezy.webp"
+                    src="/assets/logo_breezy_v2.webp"
                     alt="Logo Breezy"
                     width={100}
                     height={100}
