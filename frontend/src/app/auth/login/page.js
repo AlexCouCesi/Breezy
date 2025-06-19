@@ -26,8 +26,7 @@ export default function LoginPage() {
         }
     };
 
-    // on teste d'abord si on peut récupérer l'accessToke à partir de notre refreshToken
-    console.log('Checking for refresh token...' + Cookies.get('refreshToken'));
+    // on teste d'abord si on peut récupérer l'accessToken à partir de notre refreshToken
     useEffect(() => {
         fetch('/api/auth/refresh', {
                     method: 'GET',
