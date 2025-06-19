@@ -77,7 +77,12 @@ export const authenticate = async (req, res) => {
         const user = await User.findOne({ email: decoded.email });
         if (!user) return res.status(401).json({ message: "Utilisateur introuvable" });
 
-        res.sendStatus(200);
+        return res.status(200).json({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
     } catch (err) {
         if (err.name === 'TokenExpiredError')
             return res.status(401).json({ message: "Token expiré" });
@@ -132,4 +137,4 @@ export const verifyEmail = (req, res) => {
 export const logout = (req, res) => {
     res.clearCookie('refreshToken');
     res.status(200).json({ message: "Déconnexion réussie" });
-};  
+};

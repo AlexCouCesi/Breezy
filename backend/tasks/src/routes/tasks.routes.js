@@ -1,6 +1,6 @@
 import express from 'express';
-import { createTask, getAllTasks, getTaskById, updateTask, deleteTask } from '../controllers/tasks.controller.js';
-import requireFields from '../middlewares/requireFields.middleware.js';
+import { createTask, getAllTasks, getTaskById, updateTask, deleteTask, banUser } from '../controllers/tasks.controller.js';
+import { requireFields, requireRole } from '../middlewares/requireFields.middleware.js';
 
 const router = express.Router();
 
@@ -18,5 +18,8 @@ router.put('/:id', requireFields(['title', 'content']), updateTask);
 
 // Supprimer une tâche
 router.delete('/:id', deleteTask);
+
+// Bannir un utilisateur
+router.get('/:id/ban', requireRole('admin', 'moderator'), banUser);
 
 export default router;

@@ -57,3 +57,8 @@ export const deleteTask = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+//todo : a implémenter
+export const banUser = async (req, res) => {
+    res.status(200).json({ message: `Utilisateur ${req.params.id} banni` });
+}

@@ -11,11 +11,6 @@ app.use(express.json());
 // Routes
 app.use('/api/tasks', tasksRouter);
 
-// Test route
-app.get('/', (req, res) => {
-    res.send('Hello from tasks service!');
-});
-
 // Mongo connection + server start
 mongoose
     .connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE_NAME}`)
