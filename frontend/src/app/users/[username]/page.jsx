@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import FollowButton from '@/components/followbutton.js';
-import PostCard from '@/components/postcard.js';
+import FollowButton from '@/components/followbutton.jsx';
+import PostCard from '@/components/postcard.jsx';
 
 export default function UserProfile({ params }) {
     const username = params.username;
