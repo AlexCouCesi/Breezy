@@ -1,6 +1,5 @@
 // src/utils/apiClient.js
 import axios from 'axios';
-import Cookies from 'js-cookie';
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -20,8 +19,6 @@ const api = axios.create({
             {},
             { withCredentials: true }
             );
-            Cookies.set('accessToken', res.data.accessToken, { secure: true, sameSite: 'strict' });
-            originalRequest.headers['Authorization'] = 'Bearer ' + res.data.accessToken;
             return api(originalRequest);
         } catch (refreshError) {
             window.location.href = '/auth/login';

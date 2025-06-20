@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 export default function authenticateJWT(req, res, next) {
-    const token = req.cookies?.accessToken; // ← lit dans le cookie
+    const token = req.cookies?.accessToken;
 
     if (!token) {
         return res.status(401).json({ error: 'Token manquant ou invalide' });

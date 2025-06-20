@@ -9,20 +9,45 @@ export default function FeedPage() {
     const [newContent, setNewContent] = useState('');
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/tasks/api/posts',
-            { withCredentials: true }
-        )
-        .then(res => setPosts(res.data))
-        .catch(err => console.error(err));
-    }, []);
+        const fetchPosts = async () => {
+            try {
+            const res = await axios.get('/api/tasks/posts', {
+                withCredentials: true
+            });
+            const rawPosts = res.data;
+
+            // On récupère les données utilisateurs pour chaque author
+            const postsWithAuthors = await Promise.all(rawPosts.map(async post => {
+                try {
+                const userRes = await axios.get(
+                    `/api/auth/user/${post.author}`,
+                    { withCredentials: true }
+                );
+                return {
+                    ...post,
+                    authorData: userRes.data
+                };
+                } catch (e) {
+                return { ...post, authorData: null };
+                }
+            }));
+
+            setPosts(postsWithAuthors);
+            } catch (err) {
+            console.error(err);
+            }
+        };
+
+        fetchPosts();
+        }, []);
+
 
     const handlePublish = async () => {
         if (!newContent.trim()) return;
 
         try {
-        const token = localStorage.getItem('token');
-        const res = axios.post(
-            'http://localhost:8080/api/tasks/api/posts', 
+        const res = await axios.post(
+            '/api/tasks/posts', 
             { content: newContent }, 
             { withCredentials: true }
         );
