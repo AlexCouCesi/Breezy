@@ -7,7 +7,7 @@ export default function FeedPage() {
         {/* Sidebar gauche */}
         <aside className="w-64 bg-white p-6 border-r border-gray-300 flex flex-col gap-6">
             <div className="flex items-center gap-2">
-            <Image src="/assets/logo_breezy.webp" alt="Logo" width={30} height={30} />
+            <Image src="/assets/logo_breezy_v2.webp" alt="Logo" width={30} height={30} />
             <span className="font-semibold text-xl">Breezy</span>
             </div>
             <nav className="flex flex-col gap-3 mt-6 text-gray-800">

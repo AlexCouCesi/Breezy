@@ -10,6 +10,7 @@ export default function LayoutClient({ children }) {
         pathname === '/' ||
         pathname.startsWith('/auth/login') ||
         pathname.startsWith('/auth/register');
+        
 
     if (hideMenu) {
         return children;
