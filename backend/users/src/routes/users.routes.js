@@ -1,11 +1,11 @@
 import express from 'express';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, banUser, followUser } from '../controllers/users.controller.js';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, banUser, followUser, unfollowUser } from '../controllers/users.controller.js';
 import { requireFields, requireRole } from '../middlewares/requireFields.middleware.js';
 
 const router = express.Router();
 
 // Créer une utilisateur
-router.post('/', requireFields(['username', 'email', 'id']), createUser);
+router.post('/', requireFields(['username', 'email', '_id']), createUser);
 
 // Récupérer toutes les utilisateurs
 router.get('/', getAllUsers);
@@ -24,5 +24,8 @@ router.get('/:id/ban', requireRole('admin', 'moderator'), banUser);
 
 // Suivre une utilisateur
 router.post('/:id/follow', requireRole('user', 'moderator', 'admin'), followUser);
+
+// Desuivre une utilisateur
+router.post('/:id/unfollow', requireRole('user', 'moderator', 'admin'), unfollowUser);
 
 export default router;

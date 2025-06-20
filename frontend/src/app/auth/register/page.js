@@ -47,12 +47,13 @@ export default function RegisterPage() {
         }
 
         try {
-        await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
+        const registerResponse = await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
             username,
             email,
             password,
         });
-        await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}`, {
+        const _id = registerResponse.data;
+        await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/`, { // le / est important
             _id,
             username,
             email,
