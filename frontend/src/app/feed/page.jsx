@@ -9,7 +9,9 @@ export default function FeedPage() {
     const [newContent, setNewContent] = useState('');
 
     useEffect(() => {
-        axios.get('http://localhost:3001/api/posts')
+        axios.get('http://localhost:8080/api/tasks/api/posts',
+            { withCredentials: true }
+        )
         .then(res => setPosts(res.data))
         .catch(err => console.error(err));
     }, []);
@@ -19,10 +21,10 @@ export default function FeedPage() {
 
         try {
         const token = localStorage.getItem('token');
-        const res = await axios.post(
-            'http://localhost:3001/api/posts',
-            { content: newContent },
-            { headers: { Authorization: `Bearer ${token}` } }
+        const res = axios.post(
+            'http://localhost:8080/api/tasks/api/posts', 
+            { content: newContent }, 
+            { withCredentials: true }
         );
         setPosts([res.data.post, ...posts]);
         setNewContent('');

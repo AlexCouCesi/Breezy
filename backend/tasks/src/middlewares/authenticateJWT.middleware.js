@@ -1,17 +1,15 @@
 import jwt from 'jsonwebtoken';
 
 export default function authenticateJWT(req, res, next) {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.accessToken; // ← lit dans le cookie
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
         return res.status(401).json({ error: 'Token manquant ou invalide' });
     }
 
-    const token = authHeader.split(' ')[1];
-
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // contient l'id de l'utilisateur et d'autres données
+        req.user = decoded;
         next();
     } catch (err) {
         return res.status(403).json({ error: 'Token invalide ou expiré' });
