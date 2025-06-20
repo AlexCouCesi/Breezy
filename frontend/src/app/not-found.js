@@ -9,7 +9,7 @@ export default function NotFound() {
             Cette page est introuvable.
         </p>
         <Link
-            href="/"
+            href="/feed"
             className="inline-block bg-black text-white px-6 py-2 rounded-full hover:bg-zinc-800 transition"
         >
             Retour à l’accueil
