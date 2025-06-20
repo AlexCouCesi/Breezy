@@ -31,7 +31,7 @@ export const register = async (req, res) => {
             return res.status(400).json({ error: "Email déjà utilisé" });
 
         const newUser = await User.create({ username, email, password });
-        return res.status(201).json({ message: "Utilisateur créé !" });
+        return res.status(201).json({ message: "Utilisateur créé !", _id: newUser._id });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Erreur lors de l'inscription" });
