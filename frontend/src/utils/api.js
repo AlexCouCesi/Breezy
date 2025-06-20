@@ -1,16 +1,9 @@
-import axios from "axios";
+// src/utils/api.js
+import axios from 'axios';
 
-const apiClient = axios.create({
-    baseURL: "",
-    timeout: 5000,
+const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_AUTH_URL,
+    withCredentials: true, // pour que les cookies soient transmis automatiquement
 });
 
-export const getProducts = async () => {
-    try {
-        const response = await apiClient.get("/products");
-        return response.data;
-    } catch (error) {
-        console.error("Erreur lors de la récupération des produits :", error);
-        throw error;
-    }
-};
+export default api;

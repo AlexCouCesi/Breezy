@@ -1,6 +1,6 @@
 import express from 'express';
 import { createPost, getAllPosts } from '../controllers/posts.controller.js';
-import authenticateJWT from '../middlewares/authenticateJWT.js';
+import authenticateJWT from '../middlewares/authenticateJWT.middleware.js';
 
 const router = express.Router();
 

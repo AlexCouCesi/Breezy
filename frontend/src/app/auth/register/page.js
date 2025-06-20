@@ -1,8 +1,9 @@
+// src/app/auth/register/page.js
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import api from '@/utils/api'; // utilisation d'axios préconfiguré
 import Button from '@/components/button';
 import { Card } from '@/components/card';
 import { Input } from '@/components/input';
@@ -19,117 +20,53 @@ export default function RegisterPage() {
 
     const handleRegister = async () => {
         setErrorMessage('');
-
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&€#])[A-Za-z\d@$!%*?&€#]{8,}$/;
 
         if (!username || !email || !password || !confirmPassword) {
-        setErrorMessage('Tous les champs sont obligatoires');
-        return;
+        return setErrorMessage('Tous les champs sont obligatoires');
         }
-
         if (!passwordRegex.test(password)) {
-        setErrorMessage(
-            "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
-        );
-        return;
+        return setErrorMessage("Le mot de passe est trop faible.");
         }
-
         if (password !== confirmPassword) {
-        setErrorMessage('Les mots de passe ne correspondent pas');
-        return;
+        return setErrorMessage('Les mots de passe ne correspondent pas');
         }
 
         try {
-        await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
-            username,
-            email,
-            password,
-        });
+        await api.post('/register', { username, email, password });
         router.push('/auth/login');
         } catch (error) {
-        console.error(error);
-        setErrorMessage(
-            error.response?.data?.error || 'Une erreur est survenue'
-        );
+        setErrorMessage(error.response?.data?.error || 'Erreur serveur');
         }
     };
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
-        {/* Bloc logo */}
+        {/* Logo + Formulaire */}
         <div className="flex-1 flex items-center justify-center bg-neutral-300">
             <div className="text-center">
-            <Image
-                src="/assets/logo_breezy.webp"
-                alt="Logo Breezy"
-                width={100}
-                height={100}
-                className="mx-auto mb-2"
-            />
+            <Image src="/assets/logo_breezy.webp" alt="Logo Breezy" width={100} height={100} className="mx-auto mb-2" />
             <p className="text-xl text-black">Breezy</p>
             </div>
         </div>
-
-        {/* Bloc formulaire */}
         <div className="flex-1 flex items-center justify-center bg-neutral-300 px-4">
             <Card className="w-full max-w-md">
-            {errorMessage && (
-                <div className="mb-4 text-red-600 text-sm text-center">
-                {errorMessage}
-                </div>
-            )}
-
+            {errorMessage && <div className="mb-4 text-red-600 text-sm text-center">{errorMessage}</div>}
             <FormGroup label="Nom d'utilisateur">
-                <Input
-                type="text"
-                placeholder="Votre pseudo"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                />
+                <Input type="text" placeholder="Votre pseudo" value={username} onChange={e => setUsername(e.target.value)} />
             </FormGroup>
-
             <FormGroup label="Courriel">
-                <Input
-                type="email"
-                placeholder="nom@exemple.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                />
+                <Input type="email" placeholder="nom@exemple.com" value={email} onChange={e => setEmail(e.target.value)} />
             </FormGroup>
-
             <FormGroup label="Mot de passe">
-                <Input
-                type="password"
-                placeholder="Votre mot de passe"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                Au moins 8 caractères, avec majuscule, minuscule, chiffre et symbole.
-                </p>
+                <Input type="password" placeholder="Votre mot de passe" value={password} onChange={e => setPassword(e.target.value)} />
             </FormGroup>
-
             <FormGroup label="Confirmer le mot de passe">
-                <Input
-                type="password"
-                placeholder="Confirmez le mot de passe"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                />
+                <Input type="password" placeholder="Confirmez le mot de passe" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
             </FormGroup>
-
-            <Button onClick={handleRegister} className="mt-6 w-full">
-                Créer mon compte
-            </Button>
-
+            <Button onClick={handleRegister} className="mt-6 w-full">Créer mon compte</Button>
             <p className="mt-4 text-center text-sm text-zinc-600">
-                Déjà un compte ?{' '}
-                <span
-                onClick={() => router.push('/auth/login')}
-                className="text-blue-600 hover:underline cursor-pointer"
-                >
-                Se connecter
-                </span>
+                Déjà un compte ? <span onClick={() => router.push('/auth/login')} className="text-blue-600 hover:underline cursor-pointer">Se connecter</span>
             </p>
             </Card>
         </div>
