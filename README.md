@@ -77,7 +77,7 @@
       cd auth
       npm install
       cd ..
-      cd tasks
+      cd users
       npm install
       cd ..
       cd ..

@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import tasksRouter from './routes/tasks.routes.js';
+import usersRouter from './routes/users.routes.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 
 // Routes
-app.use('/api/tasks', tasksRouter);
+app.use('/api/users', usersRouter);
 
 // Mongo connection + server start
 mongoose
@@ -17,7 +17,7 @@ mongoose
     .then(() => {
         console.log('Connected to MongoDB');
         app.listen(port, () => {
-        console.log(`Tasks service running at http://localhost:${port}`);});
+        console.log(`Users service running at http://localhost:${port}`);});
     })
     .catch((err) => {
     console.error('MongoDB connection failed:', err);

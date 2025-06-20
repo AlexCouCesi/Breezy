@@ -26,9 +26,15 @@ export default function RegisterPage() {
         if (!username || !email || !password || !confirmPassword) {
             setErrorMessage('Tous les champs sont obligatoires');
             return;
+            setErrorMessage('Tous les champs sont obligatoires');
+            return;
         }
 
         if (!passwordRegex.test(password)) {
+            setErrorMessage(
+                "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+            );
+            return;
             setErrorMessage(
                 "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
             );
@@ -41,12 +47,17 @@ export default function RegisterPage() {
         }
 
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
-                username,
-                email,
-                password,
-            });
-            router.push('/auth/login');
+        await axios.post(`${process.env.NEXT_PUBLIC_AUTH_URL}/register`, {
+            username,
+            email,
+            password,
+        });
+        await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}`, {
+            _id,
+            username,
+            email,
+        });
+        router.push('/auth/login');
         } catch (error) {
             console.error(error);
             setErrorMessage(
