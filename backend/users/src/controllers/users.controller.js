@@ -1,5 +1,4 @@
 import User from '../models/user.model.js';
-import mongoose from 'mongoose';
 
 // Créer une nouvelle utilisateur
 export const createUser = async (req, res) => {

@@ -15,10 +15,18 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    // Connexion manuelle de l'utilisateur
     const handleLogin = async () => {
         try {
             const res = await api.post('/login', { email, password });
-            Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true, sameSite: 'strict' });
+
+            // Stockage sécurisé du token dans les cookies
+            Cookies.set('accessToken', res.data.accessToken, {
+                expires: 1,
+                secure: true,
+                sameSite: 'strict',
+            });
+
             router.push('/feed');
             router.refresh();
         } catch (error) {
@@ -26,12 +34,19 @@ export default function LoginPage() {
         }
     };
 
+    // Vérifie la présence d'un token de rafraîchissement pour connecter automatiquement l'utilisateur
     useEffect(() => {
         const checkRefreshToken = async () => {
             try {
                 const res = await api.get('/refresh');
+
                 if (res.data?.accessToken) {
-                    Cookies.set('accessToken', res.data.accessToken, { expires: 1, secure: true, sameSite: 'strict' });
+                    Cookies.set('accessToken', res.data.accessToken, {
+                        expires: 1,
+                        secure: true,
+                        sameSite: 'strict',
+                    });
+
                     router.push('/feed');
                     router.refresh();
                 } else {
@@ -41,9 +56,11 @@ export default function LoginPage() {
                 setLoading(false);
             }
         };
+
         checkRefreshToken();
     }, [router]);
 
+    // Affiche un écran de chargement pendant la vérification du token
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -52,6 +69,7 @@ export default function LoginPage() {
         );
     }
 
+    // Formulaire de connexion
     return (
         <div className="flex items-center justify-center h-screen bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 px-4">
             <div className="flex justify-center items-center w-full max-w-5xl">

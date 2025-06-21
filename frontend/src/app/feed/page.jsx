@@ -12,7 +12,7 @@ export default function FeedPage() {
     const [newContent, setNewContent] = useState('');
     const router = useRouter();
 
-    // Vérifie si utilisateur connecté (sinon redirige)
+    // Redirige vers la page de connexion si aucun token présent
     useEffect(() => {
         const token = Cookies.get('accessToken');
         if (!token) {
@@ -20,21 +20,23 @@ export default function FeedPage() {
         }
     }, [router]);
 
-    // Récupère les posts et enrichit avec auteur
+    // Récupère les posts du flux et ajoute les infos de l'auteur
     useEffect(() => {
         const fetchPosts = async () => {
             try {
                 const res = await axios.get('/api/posts/', { withCredentials: true });
                 const rawPosts = res.data;
 
+                // Enrichit chaque post avec les données de l'auteur
                 const postsWithAuthors = await Promise.all(
                     rawPosts.map(async post => {
                         try {
                             const userRes = await axios.get(`/api/auth/users/${post.author}`, {
-                                withCredentials: true
+                                withCredentials: true,
                             });
                             return { ...post, authorData: userRes.data };
                         } catch {
+                            // En cas d'erreur, on garde le post mais sans les infos auteur
                             return { ...post, authorData: null };
                         }
                     })
@@ -49,6 +51,7 @@ export default function FeedPage() {
         fetchPosts();
     }, []);
 
+    // Publication d'un nouveau post
     const handlePublish = async () => {
         if (!newContent.trim()) return;
 
@@ -58,6 +61,8 @@ export default function FeedPage() {
                 { content: newContent },
                 { withCredentials: true }
             );
+
+            // Ajoute le nouveau post en haut de la liste
             setPosts([res.data.post, ...posts]);
             setNewContent('');
         } catch (err) {
@@ -73,6 +78,7 @@ export default function FeedPage() {
                 {/* Zone de publication */}
                 <div className="bg-white border rounded-xl shadow p-4">
                     <div className="flex gap-4">
+                        {/* Avatar (statique pour l'instant) */}
                         <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0" />
                         <textarea
                             placeholder="Comment ça va ?"
@@ -104,7 +110,7 @@ export default function FeedPage() {
                 ))}
             </main>
 
-            {/* Sidebar */}
+            {/* Sidebar : utilisateurs suivis */}
             <aside className="w-80 bg-white border-l p-6 hidden lg:block">
                 <FollowedList />
             </aside>

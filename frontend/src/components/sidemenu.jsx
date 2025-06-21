@@ -5,17 +5,17 @@ import Link from 'next/link';
 import Cookies from 'js-cookie';
 import Image from 'next/image';
 
-
 export default function SideMenu() {
+    // Déconnexion : supprime le token et redirige vers l'accueil
     const handleLogout = () => {
         Cookies.remove('accessToken');
-        fetch('/api/auth/logout', { method: 'GET' });
+        fetch('/api/auth/logout', { method: 'GET' }); // Backend logout si besoin
         window.location.href = '/';
     };
 
     return (
         <aside className="w-68 bg-white shadow-md h-screen flex flex-col pl-4">
-            {/* Logo + Nom */}
+            {/* Logo + Titre */}
             <div className="flex items-center mb-6 mt-15">
                 <img
                     src="/assets/logo_breezy_v2_writeless.webp"
@@ -25,7 +25,7 @@ export default function SideMenu() {
                 <span className="text-lg font-semibold text-zinc-800">Breezy</span>
             </div>
 
-            {/* Liens de navigation */}
+            {/* Menu de navigation */}
             <div className="flex flex-col gap-10 mt-30 text-zinc-700 text-sm font-medium">
                 <Link href="/feed" className="hover:text-zinc-900 flex items-center gap-2">
                     <Image
@@ -36,7 +36,8 @@ export default function SideMenu() {
                     />
                     Page d'accueil
                 </Link>
-                                <Link href="/profile" className="hover:text-zinc-900 flex items-center gap-2">
+
+                <Link href="/profile" className="hover:text-zinc-900 flex items-center gap-2">
                     <Image
                         src="/assets/icones_nav/user_icon.png"
                         alt="Profil"
@@ -45,6 +46,7 @@ export default function SideMenu() {
                     />
                     Profil
                 </Link>
+
                 <Link href="/notifications" className="hover:text-zinc-900 flex items-center gap-2">
                     <Image
                         src="/assets/icones_nav/bell_icon.png"
@@ -54,6 +56,7 @@ export default function SideMenu() {
                     />
                     Notifications
                 </Link>
+
                 <Link href="/messages" className="hover:text-zinc-900 flex items-center gap-2">
                     <Image
                         src="/assets/icones_nav/mail_icon.png"
@@ -65,7 +68,7 @@ export default function SideMenu() {
                 </Link>
             </div>
 
-            {/* Déconnexion alignée en bas */}
+            {/* Bouton de déconnexion aligné en bas */}
             <div className="flex-1 flex items-end mb-10">
                 <button
                     onClick={handleLogout}
