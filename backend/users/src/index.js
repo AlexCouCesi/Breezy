@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import postsRouter from './routes/posts.routes.js';
 import mongoose from 'mongoose';
+import usersRouter from './routes/users.routes.js';
 
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
@@ -25,3 +26,18 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Tasks service is running on port ${PORT}`);
 });
+// Routes
+app.use('/api/users', usersRouter);
+
+// Mongo connection + server start
+mongoose
+    .connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE_NAME}`)
+    .then(() => {
+        console.log('Connected to MongoDB');
+        app.listen(port, () => {
+        console.log(`Users service running at http://localhost:${port}`);});
+    })
+    .catch((err) => {
+    console.error('MongoDB connection failed:', err);
+    process.exit(1);
+    });

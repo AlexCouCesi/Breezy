@@ -31,7 +31,7 @@ export const register = async (req, res) => {
             return res.status(400).json({ error: "Email déjà utilisé" });
 
         const newUser = await User.create({ username, email, password });
-        return res.status(201).json({ message: "Utilisateur créé !" });
+        return res.status(201).json({ message: "Utilisateur créé !", _id: newUser._id });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Erreur lors de l'inscription" });
@@ -77,7 +77,12 @@ export const authenticate = async (req, res) => {
         const user = await User.findOne({ email: decoded.email });
         if (!user) return res.status(401).json({ message: "Utilisateur introuvable" });
 
-        res.sendStatus(200);
+        return res.status(200).json({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
     } catch (err) {
         if (err.name === 'TokenExpiredError')
             return res.status(401).json({ message: "Token expiré" });
@@ -127,6 +132,11 @@ export const me = async (req, res) => {
 
 export const verifyEmail = (req, res) => {
     res.status(200).json({ message: "Email vérifié" });
+};
+
+export const logout = (req, res) => {
+    res.clearCookie('refreshToken');
+    res.status(200).json({ message: "Déconnexion réussie" });
 };
 
 export const getUserById = async (req, res) => {
