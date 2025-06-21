@@ -1,6 +1,9 @@
+version: '3.8'
+
 services:
   mongo:
     image: mongo
+    container_name: breezy-mongo
     restart: always
     ports:
       - "27017:27017"
@@ -9,39 +12,59 @@ services:
     networks:
       - breezy-net
 
+  auth:
+    build: ./backend/auth
+    container_name: breezy-auth
+    expose:
+      - "4000"
+    env_file:
+      - ./backend/auth/.env
+    depends_on:
+      - mongo
+    networks:
+      - breezy-net
+
   users:
     build: ./backend/users
+    container_name: breezy-users
     expose:
       - "5000"
     env_file:
       - ./backend/users/.env
+    depends_on:
+      - mongo
+      - auth
     networks:
       - breezy-net
 
-  auth:
-    build: ./backend/auth
-    container_name: auth
+  post:
+    build: ./backend/posts
+    container_name: breezy-post
     expose:
-      - "4000"
+      - "5000"
     env_file:
-      - ./backend/.env
+      - ./backend/posts/.env
+    depends_on:
+      - mongo
+      - auth
     networks:
       - breezy-net
 
   frontend:
     build: ./frontend
-    container_name: frontend
-    expose:
-      - "3000"
+    container_name: breezy-frontend
+    ports:
+      - "3000:3000"
     depends_on:
       - auth
       - users
+      - post
     networks:
       - breezy-net
 
   nginx:
     image: nginx:latest
-    container_name: gateway
+    container_name: breezy-gateway
     ports:
       - "8080:8080"
     volumes:
@@ -49,6 +72,7 @@ services:
     depends_on:
       - auth
       - users
+      - post
       - frontend
     networks:
       - breezy-net

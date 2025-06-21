@@ -69,34 +69,36 @@
    git clone https://github.com/votre-org/breezy.git
    cd breezy
 
-2. Installer et démarrer Docker
+2. Installer Node.js
 
-3. Démarrez les services Docker :
+3. Installer et démarrer Docker Desktop
+
+4. Démarrez les services Docker :
 
    ```bash
    docker-compose up --build
 
-4. Front-end :
+5. Front-end :
 
    ```bash
    cd frontend
    npm install
    npm run dev
 
-5. Back-end :
+6. Back-end :
 
    ```bash
    cd backend
    npm install
    npm run dev
 
-6. Service d'authentification
+7. Service d'authentification
 
    ```bash
    cd auth
    npm install
    npm run dev
 
-7. Accès à l'application :
+8. Accès à l'application :
 
 Accédez à l'application sur <http://localhost:8080>
