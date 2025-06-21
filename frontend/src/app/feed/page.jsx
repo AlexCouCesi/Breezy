@@ -24,7 +24,7 @@ export default function FeedPage() {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const res = await axios.get('/api/post', { withCredentials: true });
+                const res = await axios.get('/api/posts/', { withCredentials: true });
                 const rawPosts = res.data;
 
                 const postsWithAuthors = await Promise.all(
@@ -54,7 +54,7 @@ export default function FeedPage() {
 
         try {
             const res = await axios.post(
-                '/api/post',
+                '/api/posts/',
                 { content: newContent },
                 { withCredentials: true }
             );
