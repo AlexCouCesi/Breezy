@@ -5,21 +5,23 @@ import usersRouter from './routes/users.routes.js';
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
+// Middleware global : parse les corps JSON
 app.use(express.json());
 
-// Routes
+// Route principale pour la gestion des utilisateurs
 app.use('/api/users', usersRouter);
 
-// Mongo connection + server start
+// Connexion à MongoDB suivie du démarrage du serveur
 mongoose
     .connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE_NAME}`)
     .then(() => {
         console.log('Connected to MongoDB');
+
         app.listen(port, () => {
-        console.log(`Users service running at http://localhost:${port}`);});
+            console.log(`Users service running at http://localhost:${port}`);
+        });
     })
     .catch((err) => {
-    console.error('MongoDB connection failed:', err);
-    process.exit(1);
+        console.error('MongoDB connection failed:', err);
+        process.exit(1); // Arrêt du processus si échec de la BDD
     });

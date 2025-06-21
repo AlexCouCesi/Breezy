@@ -1,6 +1,6 @@
 import User from '../models/user.model.js';
 
-// Créer une nouvelle utilisateur
+// Crée un nouvel utilisateur (données publiques venant du service auth)
 export const createUser = async (req, res) => {
     const { username, email, _id } = req.body;
     try {
@@ -12,7 +12,7 @@ export const createUser = async (req, res) => {
     }
 };
 
-// Récupérer toutes les utilisateurs
+// Récupère tous les utilisateurs
 export const getAllUsers = async (req, res) => {
     try {
         const users = await User.find();
@@ -22,7 +22,7 @@ export const getAllUsers = async (req, res) => {
     }
 };
 
-// Récupérer une utilisateur par ID
+// Récupère un utilisateur par son ID
 export const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -33,10 +33,14 @@ export const getUserById = async (req, res) => {
     }
 };
 
-// Mettre à jour une utilisateur
+// Met à jour un utilisateur
 export const updateUser = async (req, res) => {
     try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        );
         if (!updatedUser) return res.status(404).json({ error: 'User not found' });
         res.status(200).json(updatedUser);
     } catch (err) {
@@ -44,7 +48,7 @@ export const updateUser = async (req, res) => {
     }
 };
 
-// Supprimer une utilisateur
+// Supprime un utilisateur
 export const deleteUser = async (req, res) => {
     try {
         const deleted = await User.findByIdAndDelete(req.params.id);
@@ -55,57 +59,71 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-//todo : a implémenter
+// TODO : bannir un utilisateur
 export const banUser = async (req, res) => {
     res.status(200).json({ message: `Utilisateur ${req.params.id} banni` });
-}
+};
 
+// Suivre un autre utilisateur
 export const followUser = async (req, res) => {
-    const followedUserId = req.user.id;
-    const followerUserId = req.params.id;
-    if (!followedUserId) {
+    const followerId = req.user.id;       // L'utilisateur connecté
+    const followedId = req.params.id;     // L'utilisateur à suivre
+
+    if (!followerId) {
         return res.status(400).json({ error: 'User ID is required' });
     }
-    try {
-        const followerUser = await User.findById(followerUserId);
-        const followedUser = await User.findById(followedUserId);
-        if (!followerUser) return res.status(404).json({ error: 'User not found' });
 
-        if (followedUser.followers.includes(followerUserId)) {
-            return res.status(400).json({ error: 'You are already following this user' });
-        } else {
-            followedUser.followers.push(followerUserId);
-            followerUser.following.push(followedUserId);
-            await followerUser.save();
-            await followedUser.save();
+    try {
+        const follower = await User.findById(followerId);
+        const followed = await User.findById(followedId);
+        if (!follower || !followed) {
+            return res.status(404).json({ error: 'User not found' });
         }
-        res.status(200).json({ message: `User ${followerUserId} followed user ${followedUserId}` });
+
+        if (followed.followers.includes(followerId)) {
+            return res.status(400).json({ error: 'You are already following this user' });
+        }
+
+        followed.followers.push(followerId);
+        follower.following.push(followedId);
+
+        await follower.save();
+        await followed.save();
+
+        res.status(200).json({ message: `User ${followerId} followed user ${followedId}` });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
+// Se désabonner d’un utilisateur
 export const unfollowUser = async (req, res) => {
-    const followedUserId = req.user.id;
-    const followerUserId = req.params.id;
-    if (!followedUserId) {
+    const followerId = req.user.id;       // L'utilisateur connecté
+    const followedId = req.params.id;     // L'utilisateur à désuivre
+
+    if (!followerId) {
         return res.status(400).json({ error: 'User ID is required' });
     }
-    try {
-        const followerUser = await User.findById(followerUserId);
-        const followedUser = await User.findById(followedUserId);
-        if (!followerUser) return res.status(404).json({ error: 'User not found' });
 
-        if (!followedUser.followers.includes(followerUserId)) {
-            return res.status(400).json({ error: 'You are not following this user' });
-        } else {
-            followedUser.followers.pull(followerUserId);
-            followerUser.following.pull(followedUserId);
-            await followerUser.save();
-            await followedUser.save();
+    try {
+        const follower = await User.findById(followerId);
+        const followed = await User.findById(followedId);
+        if (!follower || !followed) {
+            return res.status(404).json({ error: 'User not found' });
         }
-        res.status(200).json({ message: `User ${followerUserId} unfollowed user ${followedUserId}` });
+
+        if (!followed.followers.includes(followerId)) {
+            return res.status(400).json({ error: 'You are not following this user' });
+        }
+
+        followed.followers.pull(followerId);
+        follower.following.pull(followedId);
+
+        await follower.save();
+        await followed.save();
+
+        res.status(200).json({ message: `User ${followerId} unfollowed user ${followedId}` });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-}
+};

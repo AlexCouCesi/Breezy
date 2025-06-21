@@ -4,10 +4,12 @@ import authenticateJWT from '../middlewares/authenticateJWT.middleware.js';
 
 const router = express.Router();
 
-// Créer un post (authentifié)
+// Route POST /api/posts/
+// Création d'un nouveau post (authentification requise via JWT dans les cookies)
 router.post('/', authenticateJWT, createPost);
 
-// Récupérer tous les posts (public)
+// Route GET /api/posts/
+// Récupération de tous les posts (accessible publiquement)
 router.get('/', getAllPosts);
 
 export default router;

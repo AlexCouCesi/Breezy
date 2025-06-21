@@ -1,21 +1,24 @@
 import mongoose from 'mongoose';
 
+// Schéma de publication (post utilisateur)
 const postSchema = new mongoose.Schema({
     content: {
         type: String,
         required: true,
-        trim: true
+        trim: true // Supprime les espaces en début/fin
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'User' // suppose que tu as une collection User ailleurs
+        ref: 'User' // Fait référence à la collection "User"
     },
     createdAt: {
         type: Date,
-        default: Date.now
+        default: Date.now // Date de création automatique
     }
 });
 
+// Création du modèle Mongoose à partir du schéma
 const Post = mongoose.model('Post', postSchema);
+
 export default Post;
