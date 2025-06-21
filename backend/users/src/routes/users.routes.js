@@ -7,13 +7,14 @@ import {
     deleteUser,
     banUser,
     followUser,
-    unfollowUser
+    unfollowUser,
 } from '../controllers/users.controller.js';
 
 import {
     requireFields,
-    requireRole
-} from '../middlewares/requireFields.middleware.js';
+    requireRole,
+    isSelfOrAdmin
+} from '../middlewares/users.middleware.js';
 
 const router = express.Router();
 
@@ -27,13 +28,13 @@ router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 
 // Mettre à jour un utilisateur (requiert username et email)
-router.put('/:id', requireFields(['username', 'email']), updateUser);
+router.put('/:id', isSelfOrAdmin, requireFields(['username', 'email']), updateUser);
 
 // Supprimer un utilisateur
-router.delete('/:id', deleteUser);
+router.delete('/:id', isSelfOrAdmin, deleteUser);
 
 // Bannir un utilisateur (réservé aux admins et modérateurs)
-router.get('/:id/ban', requireRole('admin', 'moderator'), banUser);
+router.post('/:id/ban', requireRole('admin', 'moderator'), banUser);
 
 // Suivre un utilisateur (rôle requis : user ou plus)
 router.post('/:id/follow', requireRole('user', 'moderator', 'admin'), followUser);

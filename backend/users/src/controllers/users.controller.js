@@ -49,11 +49,12 @@ export const updateUser = async (req, res) => {
 };
 
 // Supprime un utilisateur
+// ne le supprime pas dans la bdd d'authentification
 export const deleteUser = async (req, res) => {
     try {
         const deleted = await User.findByIdAndDelete(req.params.id);
         if (!deleted) return res.status(404).json({ error: 'User not found' });
-        res.status(204).send();
+        res.status(204).json({ message: 'User deleted successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
