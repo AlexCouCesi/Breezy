@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import CommentSection from './commentsection';
 
 // Composant d'affichage d’un post individuel
-export default function PostCard({ post, onLike, onComment, onShare }) {
+export default function PostCard({ post, onLike, onComment, onReply, onShare }) {
     const [author, setAuthor] = useState(null);
+    const [showComments, setShowComments] = useState(false);
 
     // Récupération des infos de l’auteur du post au chargement
     useEffect(() => {
@@ -49,10 +51,17 @@ export default function PostCard({ post, onLike, onComment, onShare }) {
 
             {/* Actions : commenter / partager / aimer */}
             <div className="flex space-x-4 text-lg mt-2">
-                <button onClick={onComment} title="Commenter">💬</button>
+                <button onClick={() => setShowComments(!showComments)} title="Commenter">💬 {post.comments?.length || 0}</button>
                 <button onClick={onShare} title="Partager">🔁</button>
-                <button onClick={onLike} title="Aimer">❤️</button>
+                <button onClick={onLike} title="Aimer">❤️ {post.likes?.length || 0}</button>
             </div>
+            {showComments && (
+                <CommentSection
+                    comments={post.comments || []}
+                    onAddComment={(text) => onComment(text)}
+                    onReply={(commentId, text) => onReply(commentId, text)}
+                />
+            )}
         </div>
     );
 }

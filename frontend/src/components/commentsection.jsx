@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
-export default function CommentSection({ comments, onAddComment }) {
+export default function CommentSection({ comments, onAddComment, onReply }) {
     const [input, setInput] = useState('');
+    const [replies, setReplies] = useState({});
 
     // Gère la soumission d’un nouveau commentaire
     const handleSubmit = () => {
@@ -34,6 +35,33 @@ export default function CommentSection({ comments, onAddComment }) {
                     <div key={index} className="border-b py-2">
                         <p className="text-sm font-semibold">{comment.author}</p>
                         <p>{comment.text}</p>
+                        {comment.replies?.map(reply => (
+                            <div key={reply._id} className="ml-4 border-l pl-2 mt-2">
+                                <p className="text-sm font-semibold">{reply.author}</p>
+                                <p>{reply.text}</p>
+                            </div>
+                        ))}
+
+                        {onReply && (
+                            <div className="mt-2 ml-4">
+                                <textarea
+                                    className="w-full p-1 border rounded"
+                                    placeholder="Répondre..."
+                                    value={replies[comment._id] || ''}
+                                    onChange={(e) => setReplies({ ...replies, [comment._id]: e.target.value })}
+                                />
+                                <button
+                                    className="bg-gray-800 text-white px-2 py-0.5 rounded mt-1"
+                                    onClick={() => {
+                                        if (!replies[comment._id]?.trim()) return;
+                                        onReply(comment._id, replies[comment._id]);
+                                        setReplies({ ...replies, [comment._id]: '' });
+                                    }}
+                                >
+                                    Répondre
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

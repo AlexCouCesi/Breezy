@@ -21,6 +21,67 @@ export const createPost = async (req, res) => {
     }
 };
 
+// Like/unlike un post
+export const likePost = async (req, res) => {
+    const userId = req.user?.id;
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+
+        const index = post.likes.indexOf(userId);
+        let message;
+        if (index === -1) {
+            post.likes.push(userId);
+            message = 'Like ajouté';
+        } else {
+            post.likes.splice(index, 1);
+            message = 'Like retiré';
+        }
+        await post.save();
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Ajoute un commentaire à un post
+export const addComment = async (req, res) => {
+    const userId = req.user?.id;
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'Commentaire requis' });
+    }
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        post.comments.push({ author: userId, text });
+        await post.save();
+        res.status(201).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Répond à un commentaire sous un post
+export const replyToComment = async (req, res) => {
+    const userId = req.user?.id;
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'Réponse requise' });
+    }
+    try {
+        const post = await Post.findById(req.params.postId);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        const comment = post.comments.id(req.params.commentId);
+        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+        comment.replies.push({ author: userId, text });
+        await post.save();
+        res.status(201).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 // Récupère tous les posts, triés par date décroissante
 export const getAllPosts = async (req, res) => {
     try {
