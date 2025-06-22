@@ -25,35 +25,71 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
     }, [post.author]);
 
     return (
-        <div className="border p-4 rounded-2xl shadow mb-4 bg-white">
+        <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-colors duration-200 rounded-lg shadow-sm mb-4">
             {/* En-tête : avatar + auteur + date */}
-            <div className="flex items-center mb-2">
-                <img
-                    src={author?.avatar || 'public/assets/default-avatar-white.png'}
-                    alt="avatar"
-                    className="w-10 h-10 rounded-full mr-2"
-                />
-                <div>
-                    <p className="font-bold">
-                        {author?.username || 'Utilisateur'}{' '}
-                        <span className="text-sm font-normal text-gray-500">
-                            @{author?.username || 'inconnu'}
-                        </span>
-                    </p>
-                    <p className="text-xs text-gray-400">
-                        {new Date(post.createdAt).toLocaleString()}
-                    </p>
+            <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full border-2 border-teal-100 bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <img
+                        src={author?.avatar || '/assets/icones_divers/profile_icon.png'}
+                        alt="Photo de profil"
+                        className="w-full h-full object-cover"
+                        onError={e => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'flex';
+                        }}
+                    />
+                    <div className="hidden w-full h-full items-center justify-center text-sm font-semibold text-teal-700">
+                        PP
+                    </div>
+                </div>
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium text-slate-800">{author?.username || 'Utilisateur'}</span>
+                        <span className="text-teal-600">@{author?.username || 'inconnu'}</span>
+                        <span className="text-slate-500">•</span>
+                        <span className="text-slate-500">{new Date(post.createdAt).toLocaleString()}</span>
+                    </div>
                 </div>
             </div>
 
             {/* Contenu du post */}
-            <p className="mb-2 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-slate-700 leading-relaxed mb-4 italic whitespace-pre-wrap">{post.content}</p>
 
             {/* Actions : commenter / partager / aimer */}
-            <div className="flex space-x-4 text-lg mt-2">
-                <button onClick={() => setShowComments(!showComments)} title="Commenter">💬 {post.comments?.length || 0}</button>
-                <button onClick={onShare} title="Partager">🔁</button>
-                <button onClick={onLike} title="Aimer">❤️ {post.likes?.length || 0}</button>
+            <div className="flex items-center gap-6">
+                <button
+                    onClick={onComment}
+                    title="Commenter"
+                    className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
+                >
+                    <img
+                        src="/assets/icones_comments/comment_icon.png"
+                        alt="Commenter"
+                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                    />
+                </button>
+                <button
+                    onClick={onShare}
+                    title="Partager"
+                    className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors duration-200 p-2 rounded hover:bg-emerald-50"
+                >
+                    <img
+                        src="/assets/icones_comments/share_icon.png"
+                        alt="Partager"
+                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                    />
+                </button>
+                <button
+                    onClick={onLike}
+                    title="Aimer"
+                    className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors duration-200 p-2 rounded hover:bg-rose-50"
+                >
+                    <img
+                        src="/assets/icones_comments/heart_icon.png"
+                        alt="Aimer"
+                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                    />
+                </button>
             </div>
             {showComments && (
                 <CommentSection
