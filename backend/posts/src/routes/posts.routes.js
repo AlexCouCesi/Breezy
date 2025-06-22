@@ -4,9 +4,9 @@ import {
     getAllPosts,
     getPostsByUser,
     likePost,
+    repostPost,
     addComment,
     replyToComment,
-    repostPost,
     deletePost
 } from '../controllers/posts.controller.js';
 import authenticateJWT from '../middlewares/authenticateJWT.middleware.js';
@@ -34,9 +34,6 @@ router.post('/:id/comment', authenticateJWT, addComment);
 router.post('/:postId/comments/:commentId/reply', authenticateJWT, replyToComment);
 
 // Republier un post existant
-router.post('/:id/repost', authenticateJWT, repostPost);
-
-// Republier un post
 router.post('/:id/repost', authenticateJWT, repostPost);
 
 // Supprimer un post ou une republication

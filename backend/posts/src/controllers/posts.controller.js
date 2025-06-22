@@ -95,22 +95,17 @@ export const getAllPosts = async (req, res) => {
 // Republie un post existant
 export const repostPost = async (req, res) => {
     const userId = req.user?.id;
-    const originalId = req.params.id;
-
     try {
-        const originalPost = await Post.findById(originalId);
-        if (!originalPost) return res.status(404).json({ error: 'Post not found' });
+        const original = await Post.findById(req.params.id);
+        if (!original) return res.status(404).json({ error: 'Post not found' });
 
-        if (originalPost.author.toString() === userId) {
-            return res.status(400).json({ error: 'Impossible de republier votre propre post' });
-        }
-
-        const already = await Post.findOne({ author: userId, repostOf: originalId });
-        if (already) return res.status(400).json({ error: 'Post déjà republicé' });
-
-        const repost = new Post({ content: originalPost.content, author: userId, repostOf: originalId });
-        await repost.save();
-        res.status(201).json({ message: 'Post republicé', post: repost });
+        const newPost = new Post({
+            content: original.content,
+            author: userId,
+            repostOf: original._id
+        });
+        await newPost.save();
+        res.status(201).json({ message: 'Post republié', post: newPost });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
