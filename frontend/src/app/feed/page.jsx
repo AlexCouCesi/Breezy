@@ -70,6 +70,33 @@ export default function FeedPage() {
         }
     };
 
+    const handleLike = async (postId) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur like', err);
+        }
+    };
+
+    const handleAddComment = async (postId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur commentaire', err);
+        }
+    };
+
+    const handleReply = async (postId, commentId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur réponse', err);
+        }
+    };
+
     return (
         <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             <main className="flex-1 p-6 overflow-y-auto space-y-6 max-w-4xl mx-auto">
@@ -103,8 +130,9 @@ export default function FeedPage() {
                     <PostCard
                         key={post._id}
                         post={post}
-                        onLike={() => {}}
-                        onComment={() => {}}
+                        onLike={() => handleLike(post._id)}
+                        onComment={(text) => handleAddComment(post._id, text)}
+                        onReply={(commentId, text) => handleReply(post._id, commentId, text)}
                         onShare={() => {}}
                     />
                 ))}
