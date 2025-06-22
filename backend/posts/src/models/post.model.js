@@ -7,6 +7,11 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true // Supprime les espaces en début/fin
     },
+    repostOf: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+        default: null
+    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

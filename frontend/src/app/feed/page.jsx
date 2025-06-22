@@ -73,9 +73,18 @@ export default function FeedPage() {
     const handleShare = async (postId) => {
         try {
             const res = await axios.post(`/api/posts/${postId}/repost`, {}, { withCredentials: true });
-            setPosts([res.data, ...posts]);
+            setPosts([res.data.post, ...posts]);
         } catch (err) {
             console.error('Erreur republication', err);
+        }
+    };
+
+    const handleDelete = async (postId) => {
+        try {
+            await axios.delete(`/api/posts/${postId}`, { withCredentials: true });
+            setPosts(posts.filter(p => p._id !== postId));
+        } catch (err) {
+            console.error('Erreur suppression', err);
         }
     };
 
@@ -91,7 +100,7 @@ export default function FeedPage() {
                         <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0" />
                         <textarea
                             placeholder="Comment ça va ?"
-                            className="w-full border rounded-md p-2 resize-none"
+                            className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
                             rows={3}
                             value={newContent}
                             onChange={e => setNewContent(e.target.value)}
@@ -116,6 +125,7 @@ export default function FeedPage() {
                         onComment={(text) => handleAddComment(post._id, text)}
                         onReply={(commentId, text) => handleReply(post._id, commentId, text)}
                         onShare={() => handleShare(post._id)}
+                        onDelete={() => handleDelete(post._id)}
                     />
                 ))}
             </main>

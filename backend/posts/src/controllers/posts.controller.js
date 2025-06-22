@@ -92,27 +92,51 @@ export const getAllPosts = async (req, res) => {
     }
 };
 
-// Récupère les posts d'un utilisateur spécifique
-export const getPostsByUser = async (req, res) => {
+// Republie un post existant
+export const repostPost = async (req, res) => {
+    const userId = req.user?.id;
+    const originalId = req.params.id;
+
     try {
-        const posts = await Post.find({ author: req.params.userId }).sort({ createdAt: -1 });
-        res.status(200).json(posts);
+        const originalPost = await Post.findById(originalId);
+        if (!originalPost) return res.status(404).json({ error: 'Post not found' });
+
+        if (originalPost.author.toString() === userId) {
+            return res.status(400).json({ error: 'Impossible de republier votre propre post' });
+        }
+
+        const already = await Post.findOne({ author: userId, repostOf: originalId });
+        if (already) return res.status(400).json({ error: 'Post déjà republicé' });
+
+        const repost = new Post({ content: originalPost.content, author: userId, repostOf: originalId });
+        await repost.save();
+        res.status(201).json({ message: 'Post republicé', post: repost });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-// Republie un post existant
-export const repostPost = async (req, res) => {
+// Supprime un post (ou une republication)
+export const deletePost = async (req, res) => {
     const userId = req.user?.id;
     try {
-        const original = await Post.findById(req.params.id);
-        if (!original) return res.status(404).json({ error: 'Post not found' });
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        if (post.author.toString() !== userId) {
+            return res.status(403).json({ error: 'Action non autorisée' });
+        }
+        await Post.findByIdAndDelete(req.params.id);
+        res.status(204).send();
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
-        const newPost = new Post({ content: original.content, author: userId });
-        await newPost.save();
-
-        res.status(201).json(newPost);
+// Récupère les posts d'un utilisateur spécifique
+export const getPostsByUser = async (req, res) => {
+    try {
+        const posts = await Post.find({ author: req.params.userId }).sort({ createdAt: -1 });
+        res.status(200).json(posts);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

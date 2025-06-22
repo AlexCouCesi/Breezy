@@ -6,7 +6,8 @@ import {
     likePost,
     addComment,
     replyToComment,
-    repostPost
+    repostPost,
+    deletePost
 } from '../controllers/posts.controller.js';
 import authenticateJWT from '../middlewares/authenticateJWT.middleware.js';
 
@@ -34,5 +35,11 @@ router.post('/:postId/comments/:commentId/reply', authenticateJWT, replyToCommen
 
 // Republier un post existant
 router.post('/:id/repost', authenticateJWT, repostPost);
+
+// Republier un post
+router.post('/:id/repost', authenticateJWT, repostPost);
+
+// Supprimer un post ou une republication
+router.delete('/:id', authenticateJWT, deletePost);
 
 export default router;

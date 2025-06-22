@@ -15,7 +15,7 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
         <div className="mt-4">
             {/* Champ de saisie du commentaire */}
             <textarea
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded text-slate-900 placeholder-slate-500"
                 placeholder="Écrire ici..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -33,19 +33,19 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
             <div className="mt-4">
                 {comments.map((comment, index) => (
                     <div key={index} className="border-b py-2">
-                        <p className="text-sm font-semibold">{comment.author}</p>
-                        <p>{comment.text}</p>
+                        <p className="text-sm font-semibold text-slate-700">{comment.author}</p>
+                        <p className="text-slate-800">{comment.text}</p>
                         {comment.replies?.map(reply => (
                             <div key={reply._id} className="ml-4 border-l pl-2 mt-2">
-                                <p className="text-sm font-semibold">{reply.author}</p>
-                                <p>{reply.text}</p>
+                                <p className="text-sm font-semibold text-slate-700">{reply.author}</p>
+                                <p className="text-slate-800">{reply.text}</p>
                             </div>
                         ))}
 
                         {onReply && (
                             <div className="mt-2 ml-4">
                                 <textarea
-                                    className="w-full p-1 border rounded"
+                                    className="w-full p-1 border rounded text-slate-900 placeholder-slate-500"
                                     placeholder="Répondre..."
                                     value={replies[comment._id] || ''}
                                     onChange={(e) => setReplies({ ...replies, [comment._id]: e.target.value })}

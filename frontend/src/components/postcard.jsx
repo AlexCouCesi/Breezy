@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
+import useUser from '@/utils/useuser';
 
 // Composant d'affichage d’un post individuel
-export default function PostCard({ post, onLike, onComment, onReply, onShare }) {
+export default function PostCard({ post, onLike, onComment, onReply, onShare, onDelete }) {
     const [author, setAuthor] = useState(null);
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
+    const currentUser = useUser();
+    const [reposted, setReposted] = useState(false);
+    const toggleComments = () => setShowComments((prev) => !prev);
 
     const getUserId = () => {
         const token = Cookies.get('accessToken');
@@ -93,17 +97,29 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
                         className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                 </button>
-                <button
-                    onClick={onShare}
-                    title="Partager"
-                    className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors duration-200 p-2 rounded hover:bg-emerald-50"
-                >
-                    <img
-                        src="/assets/icones_comments/share_icon.png"
-                        alt="Partager"
-                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                    />
-                </button>
+                {currentUser && post.author !== currentUser._id && (
+                    <button
+                        onClick={() => { onShare(); setReposted(true); }}
+                        title="Republier"
+                        disabled={reposted}
+                        className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors duration-200 p-2 rounded hover:bg-emerald-50 disabled:opacity-50"
+                    >
+                        <img
+                            src="/assets/icones_comments/share_icon.png"
+                            alt="Republier"
+                            className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                        />
+                    </button>
+                )}
+                {currentUser && post.author === currentUser._id && (
+                    <button
+                        onClick={onDelete}
+                        title="Supprimer"
+                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50"
+                    >
+                        Supprimer
+                    </button>
+                )}
                 <button
                     onClick={handleLikeClick}
                     title="Aimer"
@@ -121,11 +137,19 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
                 </button>
             </div>
             {showComments && (
-                <CommentSection
-                    comments={post.comments || []}
-                    onAddComment={(text) => onComment(text)}
-                    onReply={(commentId, text) => onReply(commentId, text)}
-                />
+                <div className="mt-4">
+                    <CommentSection
+                        comments={post.comments || []}
+                        onAddComment={(text) => onComment(text)}
+                        onReply={(commentId, text) => onReply(commentId, text)}
+                    />
+                    <button
+                        onClick={toggleComments}
+                        className="text-sm text-teal-600 mt-2 hover:underline"
+                    >
+                        Fermer
+                    </button>
+                </div>
             )}
         </div>
     );
