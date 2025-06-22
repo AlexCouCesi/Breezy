@@ -91,3 +91,29 @@ export const getAllPosts = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+// Récupère les posts d'un utilisateur spécifique
+export const getPostsByUser = async (req, res) => {
+    try {
+        const posts = await Post.find({ author: req.params.userId }).sort({ createdAt: -1 });
+        res.status(200).json(posts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Republie un post existant
+export const repostPost = async (req, res) => {
+    const userId = req.user?.id;
+    try {
+        const original = await Post.findById(req.params.id);
+        if (!original) return res.status(404).json({ error: 'Post not found' });
+
+        const newPost = new Post({ content: original.content, author: userId });
+        await newPost.save();
+
+        res.status(201).json(newPost);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

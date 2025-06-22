@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 
 // Composant d'affichage d’un post individuel
 export default function PostCard({ post, onLike, onComment, onReply, onShare }) {
     const [author, setAuthor] = useState(null);
     const [showComments, setShowComments] = useState(false);
+    const [liked, setLiked] = useState(false);
+
+    const getUserId = () => {
+        const token = Cookies.get('accessToken');
+        if (!token) return null;
+        try {
+            return JSON.parse(atob(token.split('.')[1])).id;
+        } catch {
+            return null;
+        }
+    };
+
+    const userId = getUserId();
+
+    const handleLikeClick = () => {
+        setLiked(!liked);
+        onLike();
+    };
 
     // Récupération des infos de l’auteur du post au chargement
     useEffect(() => {
@@ -23,6 +42,12 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
 
         fetchAuthor();
     }, [post.author]);
+
+    useEffect(() => {
+        if (userId) {
+            setLiked(post.likes?.includes(userId));
+        }
+    }, [post.likes, userId]);
 
     return (
         <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-colors duration-200 rounded-lg shadow-sm mb-4">
@@ -58,7 +83,7 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
             {/* Actions : commenter / partager / aimer */}
             <div className="flex items-center gap-6">
                 <button
-                    onClick={onComment}
+                    onClick={() => setShowComments(!showComments)}
                     title="Commenter"
                     className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
                 >
@@ -80,15 +105,19 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare }) 
                     />
                 </button>
                 <button
-                    onClick={onLike}
+                    onClick={handleLikeClick}
                     title="Aimer"
                     className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors duration-200 p-2 rounded hover:bg-rose-50"
                 >
-                    <img
-                        src="/assets/icones_comments/heart_icon.png"
-                        alt="Aimer"
-                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                    />
+                {liked ? (
+                        <span className="text-red-500">❤️</span>
+                    ) : (
+                        <img
+                            src="/assets/icones_comments/heart_icon.png"
+                            alt="Aimer"
+                            className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                        />
+                    )}
                 </button>
             </div>
             {showComments && (

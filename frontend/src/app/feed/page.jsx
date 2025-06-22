@@ -70,30 +70,12 @@ export default function FeedPage() {
         }
     };
 
-    const handleLike = async (postId) => {
+    const handleShare = async (postId) => {
         try {
-            const res = await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+            const res = await axios.post(`/api/posts/${postId}/repost`, {}, { withCredentials: true });
+            setPosts([res.data, ...posts]);
         } catch (err) {
-            console.error('Erreur like', err);
-        }
-    };
-
-    const handleAddComment = async (postId, text) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
-        } catch (err) {
-            console.error('Erreur commentaire', err);
-        }
-    };
-
-    const handleReply = async (postId, commentId, text) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
-        } catch (err) {
-            console.error('Erreur réponse', err);
+            console.error('Erreur republication', err);
         }
     };
 
@@ -133,7 +115,7 @@ export default function FeedPage() {
                         onLike={() => handleLike(post._id)}
                         onComment={(text) => handleAddComment(post._id, text)}
                         onReply={(commentId, text) => handleReply(post._id, commentId, text)}
-                        onShare={() => {}}
+                        onShare={() => handleShare(post._id)}
                     />
                 ))}
             </main>
