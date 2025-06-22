@@ -17,17 +17,15 @@ const postSchema = new mongoose.Schema({
         required: true,
         ref: 'User' // Fait référence à la collection "User"
     },
-    // Référence éventuelle au post original en cas de republication
-    repostOf: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post',
-        default: null
-    },
     createdAt: {
         type: Date,
         default: Date.now // Date de création automatique
     },
     likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    shares: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],

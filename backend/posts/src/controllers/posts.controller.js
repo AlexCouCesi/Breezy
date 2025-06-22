@@ -28,17 +28,45 @@ export const likePost = async (req, res) => {
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: 'Post not found' });
 
-        const index = post.likes.indexOf(userId);
-        let message;
-        if (index === -1) {
-            post.likes.push(userId);
-            message = 'Like ajouté';
+        const alreadyLiked = post.likes.some(id => id.toString() === userId);
+        if (alreadyLiked) {
+            post.likes = post.likes.filter(id => id.toString() !== userId);
         } else {
-            post.likes.splice(index, 1);
-            message = 'Like retiré';
+            post.likes.push(userId);
         }
         await post.save();
         res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Republie ou annule la republication d'un post
+export const sharePost = async (req, res) => {
+    const userId = req.user?.id;
+
+    try {
+        const originalPost = await Post.findById(req.params.id);
+        if (!originalPost) return res.status(404).json({ error: 'Post not found' });
+
+        // Vérifie si l'utilisateur a déjà partagé ce post
+        const alreadyShared = await Post.findOne({ author: userId, repostOf: originalPost._id });
+        if (alreadyShared) {
+            // Supprimer la republication
+            await Post.findByIdAndDelete(alreadyShared._id);
+            return res.status(200).json({ message: 'Republication supprimée' });
+        }
+
+        // Crée un nouveau post de republication
+        const sharedPost = new Post({
+            author: userId,
+            repostOf: originalPost._id,
+            content: '', // Vide ou personnalisé si tu veux laisser un message en plus
+        });
+
+        await sharedPost.save();
+        res.status(201).json({ message: 'Post republicated', post: sharedPost });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -87,25 +115,6 @@ export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
         res.status(200).json(posts);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-// Republie un post existant
-export const repostPost = async (req, res) => {
-    const userId = req.user?.id;
-    try {
-        const original = await Post.findById(req.params.id);
-        if (!original) return res.status(404).json({ error: 'Post not found' });
-
-        const newPost = new Post({
-            content: original.content,
-            author: userId,
-            repostOf: original._id
-        });
-        await newPost.save();
-        res.status(201).json({ message: 'Post republié', post: newPost });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

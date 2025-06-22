@@ -4,7 +4,7 @@ import {
     getAllPosts,
     getPostsByUser,
     likePost,
-    repostPost,
+    sharePost,
     addComment,
     replyToComment,
     deletePost
@@ -33,8 +33,8 @@ router.post('/:id/comment', authenticateJWT, addComment);
 // Répondre à un commentaire existant
 router.post('/:postId/comments/:commentId/reply', authenticateJWT, replyToComment);
 
-// Republier un post existant
-router.post('/:id/repost', authenticateJWT, repostPost);
+// Republier ou annuler la republication d'un post
+router.post('/:id/share', authenticateJWT, sharePost);
 
 // Supprimer un post ou une republication
 router.delete('/:id', authenticateJWT, deletePost);

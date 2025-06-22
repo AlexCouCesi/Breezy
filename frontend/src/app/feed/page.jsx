@@ -72,8 +72,7 @@ export default function FeedPage() {
 
     const handleShare = async (postId) => {
         try {
-            const res = await axios.post(`/api/posts/${postId}/repost`, {}, { withCredentials: true });
-            // Ajoute le nouveau post en haut du flux
+            const res = await axios.post(`/api/posts/${postId}/share`, {}, { withCredentials: true });
             setPosts([res.data.post, ...posts]);
         } catch (err) {
             console.error('Erreur republication', err);
@@ -95,15 +94,6 @@ export default function FeedPage() {
             setPosts(posts.filter(p => p._id !== postId));
         } catch (err) {
             console.error('Erreur suppression', err);
-        }
-    };
-
-    const handleReply = async (postId, commentId, text) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
-        } catch (err) {
-            console.error('Erreur réponse', err);
         }
     };
 
