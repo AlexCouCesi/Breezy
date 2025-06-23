@@ -4,13 +4,14 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
     // Utilise l’_id fourni depuis le service d’authentification
     _id: String,
-
     // Nom d’utilisateur public
     username: String,
-
     // Email associé
     email: String,
-
+    // Biographie courte
+    biography: String,
+    // Photo de profil (URL)
+    profilePicture: String,
     // Liste des utilisateurs qui suivent ce compte
     followers: [
         {
@@ -18,8 +19,7 @@ const userSchema = new mongoose.Schema({
             ref: 'User',
             default: []
         }
-    ],
-
+    ],    
     // Liste des utilisateurs suivis par ce compte
     following: [
         {

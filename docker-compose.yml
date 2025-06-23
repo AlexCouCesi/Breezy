@@ -39,6 +39,8 @@ services:
       - auth
     networks:
       - breezy-net
+    volumes:
+      - ./backend/users/uploads:/app/uploads
 
   # Service des publications (posts, commentaires, likes)
   post:
@@ -75,6 +77,7 @@ services:
       - "8080:8080" # exposé à l’extérieur
     volumes:
       - ./backend/gateway/nginx.conf:/etc/nginx/nginx.conf
+      - ./backend/users/uploads:/app/uploads
     depends_on:
       - auth
       - users

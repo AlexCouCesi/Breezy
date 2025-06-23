@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import {
     createUser,
     getAllUsers,
@@ -17,6 +18,7 @@ import {
 } from '../middlewares/users.middleware.js';
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/profile-pictures/' });
 
 // Créer un utilisateur (requiert username, email et _id)
 router.post('/', requireFields(['username', 'email', '_id']), createUser);
@@ -28,7 +30,7 @@ router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 
 // Mettre à jour un utilisateur (requiert username et email)
-router.put('/:id', isSelfOrAdmin, requireFields(['username', 'email']), updateUser);
+router.put('/:id', isSelfOrAdmin, upload.single('photo'), updateUser);
 
 // Supprimer un utilisateur
 router.delete('/:id', isSelfOrAdmin, deleteUser);

@@ -36,9 +36,16 @@ export const getUserById = async (req, res) => {
 // Met à jour un utilisateur
 export const updateUser = async (req, res) => {
     try {
+        const updateData = { ...req.body };
+
+        // Si une nouvelle photo a été uploadée, ajoute son chemin/URL
+        if (req.file) {
+            updateData.profilePicture = req.file.path; // ou adapte selon ton besoin (URL publique, etc.)
+        }
+
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            updateData,
             { new: true }
         );
         if (!updatedUser) return res.status(404).json({ error: 'User not found' });
