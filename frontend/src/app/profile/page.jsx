@@ -53,7 +53,7 @@ export default function Profile() {
     const handleLike = async (postId) => {
         try {
             const res = await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+            setPosts(posts.map(p => p._id === postId ? { ...res.data, authorData: p.authorData } : p));
         } catch (err) {
             console.error('Erreur like', err);
         }
