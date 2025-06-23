@@ -114,3 +114,53 @@ export const getPostsByUser = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const deleteComment = async (req, res) => {
+    const userId = req.user?.id;
+    const { postId, commentId } = req.params;
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) return res.status(404).json({ error: 'Post introuvable' });
+
+        const comment = post.comments.id(commentId);
+        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+
+        if (comment.author.toString() !== userId) {
+            return res.status(403).json({ error: 'Action non autorisée' });
+        }
+
+        comment.remove(); // Supprime le sous-document
+        await post.save();
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const deleteReply = async (req, res) => {
+    const userId = req.user?.id;
+    const { postId, commentId, replyId } = req.params;
+
+    try {
+        const post = await Post.findById(postId);
+        if (!post) return res.status(404).json({ error: 'Post introuvable' });
+
+        const comment = post.comments.id(commentId);
+        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+
+        const reply = comment.replies.id(replyId);
+        if (!reply) return res.status(404).json({ error: 'Réponse introuvable' });
+
+        if (reply.author.toString() !== userId) {
+            return res.status(403).json({ error: 'Action non autorisée' });
+        }
+
+        reply.remove();
+        await post.save();
+
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

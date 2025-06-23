@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
 
-export default function PostCard({ post, onLike, onComment, onReply, onShare, onDelete }) {
+export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -106,6 +105,8 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         comments={post.comments || []}
                         onAddComment={(text) => onComment(text)}
                         onReply={(commentId, text) => onReply(commentId, text)}
+                        onDeleteComment={(commentId) => onDeleteComment(post._id, commentId)}
+                        onDeleteReply={(commentId, replyId) => onDeleteReply(post._id, commentId, replyId)}
                     />
                     <button
                         onClick={() => setShowComments(false)}
