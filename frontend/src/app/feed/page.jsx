@@ -71,13 +71,27 @@ export default function FeedPage() {
                 { withCredentials: true }
             );
 
-            // Ajoute le nouveau post en haut de la liste
-            setPosts([res.data.post, ...posts]);
+            const newPost = res.data.post;
+
+            // Récupère les infos de l’auteur
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${newPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur", err);
+            }
+
+            // Ajoute le post avec les données enrichies
+            setPosts([{ ...newPost, authorData }, ...posts]);
             setNewContent('');
         } catch (err) {
             console.error('Erreur publication', err);
         }
     };
+
 
     const handleAddComment = async (postId, text) => {
         try {
