@@ -21,10 +21,94 @@ export const createPost = async (req, res) => {
     }
 };
 
+// Like/unlike un post
+export const likePost = async (req, res) => {
+    const userId = req.user?.id;
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+
+        const alreadyLiked = post.likes.some(id => id.toString() === userId);
+        if (alreadyLiked) {
+            post.likes = post.likes.filter(id => id.toString() !== userId);
+        } else {
+            post.likes.push(userId);
+        }
+        await post.save();
+        res.status(200).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Ajoute un commentaire à un post
+export const addComment = async (req, res) => {
+    const userId = req.user?.id;
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'Commentaire requis' });
+    }
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        post.comments.push({ author: userId, text });
+        await post.save();
+        res.status(201).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Répond à un commentaire sous un post
+export const replyToComment = async (req, res) => {
+    const userId = req.user?.id;
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'Réponse requise' });
+    }
+    try {
+        const post = await Post.findById(req.params.postId);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        const comment = post.comments.id(req.params.commentId);
+        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+        comment.replies.push({ author: userId, text });
+        await post.save();
+        res.status(201).json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 // Récupère tous les posts, triés par date décroissante
 export const getAllPosts = async (req, res) => {
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
+        res.status(200).json(posts);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Supprime un post (ou une republication)
+export const deletePost = async (req, res) => {
+    const userId = req.user?.id;
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: 'Post not found' });
+        if (post.author.toString() !== userId) {
+            return res.status(403).json({ error: 'Action non autorisée' });
+        }
+        await Post.findByIdAndDelete(req.params.id);
+        res.status(204).send();
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// Récupère les posts d'un utilisateur spécifique
+export const getPostsByUser = async (req, res) => {
+    try {
+        const posts = await Post.find({ author: req.params.userId }).sort({ createdAt: -1 });
         res.status(200).json(posts);
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -31,7 +31,7 @@ export default function FeedPage() {
                 const postsWithAuthors = await Promise.all(
                     rawPosts.map(async post => {
                         try {
-                            const userRes = await axios.get(`/api/auth/users/${post.author}`, {
+                            const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
                                 withCredentials: true,
                             });
                             return { ...post, authorData: userRes.data };
@@ -50,6 +50,15 @@ export default function FeedPage() {
 
         fetchPosts();
     }, []);
+
+    const handleLike = async (postId) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur like', err);
+        }
+    };
 
     // Publication d'un nouveau post
     const handlePublish = async () => {
@@ -70,6 +79,24 @@ export default function FeedPage() {
         }
     };
 
+    const handleAddComment = async (postId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur commentaire', err);
+        }
+    };
+
+    const handleDelete = async (postId) => {
+        try {
+            await axios.delete(`/api/posts/${postId}`, { withCredentials: true });
+            setPosts(posts.filter(p => p._id !== postId));
+        } catch (err) {
+            console.error('Erreur suppression', err);
+        }
+    };
+
     return (
         <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             <main className="flex-1 p-6 overflow-y-auto space-y-6 max-w-4xl mx-auto">
@@ -82,7 +109,7 @@ export default function FeedPage() {
                         <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0" />
                         <textarea
                             placeholder="Comment ça va ?"
-                            className="w-full border rounded-md p-2 resize-none"
+                            className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
                             rows={3}
                             value={newContent}
                             onChange={e => setNewContent(e.target.value)}
@@ -103,9 +130,10 @@ export default function FeedPage() {
                     <PostCard
                         key={post._id}
                         post={post}
-                        onLike={() => {}}
-                        onComment={() => {}}
-                        onShare={() => {}}
+                        onLike={() => handleLike(post._id)}
+                        onComment={(text) => handleAddComment(post._id, text)}
+                        onReply={(commentId, text) => handleReply(post._id, commentId, text)}
+                        onDelete={() => handleDelete(post._id)}
                     />
                 ))}
             </main>
