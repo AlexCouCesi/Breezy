@@ -18,17 +18,6 @@
 | Fx8  | Répondre à un commentaire                                      | Utilisateur            |
 | Fx9  | Suivre / être suivi                                            | Utilisateur            |
 | Fx10 | Profil utilisateur (photo, bio)                                | Utilisateur            |
-| Fx17 | Messagerie privée entre utilisateurs                           | Utilisateur            |
-
-**Fonctionnalités secondaires (optionnelles) :**
-
-- Ajout de tags aux messages & recherche par tags (Fx12, Fx13)
-- Notifications (mentions, likes, nouveaux followers) (Fx14, Fx16)  
-- Upload d’images et de vidéos (Fx18, Fx19)  
-- Signalement de contenu inapproprié (Fx20)  
-- Suspension / bannissement (Fx21)  
-- Interface multi-langues (Fx22)  
-- Thème personnalisé (Fx23)  
 
 ---
 
