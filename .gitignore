@@ -1,5 +1,9 @@
+# Ignorer les dépendances Node.js
 backend/node_modules
 backend/auth/node_modules
-backend/tasks/node_modules
+backend/users/node_modules
+backend/posts/node_modules
 frontend/node_modules
+
+# Ignorer les fichiers de build Next.js (frontend)
 frontend/.next

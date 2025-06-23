@@ -1,16 +1,9 @@
-import axios from "axios";
+import axios from 'axios';
 
-const apiClient = axios.create({
-    baseURL: "",
-    timeout: 5000,
+// Instance Axios préconfigurée pour l'authentification
+const api = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_AUTH_URL, // Ex: http://localhost:5000 ou domaine distant
+    withCredentials: true, // Envoie les cookies (ex: JWT) dans les requêtes cross-origin
 });
 
-export const getProducts = async () => {
-    try {
-        const response = await apiClient.get("/products");
-        return response.data;
-    } catch (error) {
-        console.error("Erreur lors de la récupération des produits :", error);
-        throw error;
-    }
-};
+export default api;
