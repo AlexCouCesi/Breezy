@@ -12,7 +12,7 @@
 | Fx2  | Authentification sécurisée (JWT)                               | Utilisateur            |
 | Fx3  | Publication de messages courts (280 caractères)                | Utilisateur            |
 | Fx4  | Affichage des messages sur le profil                           | Utilisateur            |
-| Fx5  | Fil chronologique des messages des abonnements                 | Utilisateur            |
+| Fx5  | Fil chronologique des messages des utilisateurs suivis         | Utilisateur            |
 | Fx6  | Liker un post                                                  | Utilisateur            |
 | Fx7  | Commenter un post                                              | Utilisateur            |
 | Fx8  | Répondre à un commentaire                                      | Utilisateur            |
