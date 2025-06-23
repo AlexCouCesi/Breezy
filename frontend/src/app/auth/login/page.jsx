@@ -34,11 +34,7 @@ export default function LoginPage() {
         }
     };
 
-<<<<<<< HEAD:frontend/src/app/auth/login/page.js
-    // Vérification automatique du refreshToken au montage de la page
-=======
     // Vérifie la présence d'un token de rafraîchissement pour connecter automatiquement l'utilisateur
->>>>>>> origin/develop:frontend/src/app/auth/login/page.jsx
     useEffect(() => {
         const checkRefreshToken = async () => {
             try {
