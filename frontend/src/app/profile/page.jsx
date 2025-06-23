@@ -62,7 +62,23 @@ export default function Profile() {
     const handleAddComment = async (postId, text) => {
         try {
             const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+            const updatedPost = res.data;
+
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
         } catch (err) {
             console.error('Erreur commentaire', err);
         }
@@ -71,7 +87,23 @@ export default function Profile() {
     const handleReply = async (postId, commentId, text) => {
         try {
             const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+            const updatedPost = res.data;
+
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
         } catch (err) {
             console.error('Erreur réponse', err);
         }
@@ -94,6 +126,39 @@ export default function Profile() {
         } catch (err) {
             console.error("Erreur suppression", err);
         }
+    };
+
+    const enrichCommentsWithUser = async (comments) => {
+        return Promise.all(comments.map(async (comment) => {
+            let enrichedAuthor = null;
+            try {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${comment.author}`, {
+                    withCredentials: true,
+                });
+                enrichedAuthor = res.data;
+            } catch (err) {
+                console.warn("Erreur récupération auteur du commentaire", err);
+            }
+
+            const enrichedReplies = await Promise.all((comment.replies || []).map(async (reply) => {
+                let replyAuthor = null;
+                try {
+                    const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${reply.author}`, {
+                        withCredentials: true,
+                    });
+                    replyAuthor = res.data;
+                } catch (err) {
+                    console.warn("Erreur récupération auteur de la réponse", err);
+                }
+                return { ...reply, authorData: replyAuthor };
+            }));
+
+            return {
+                ...comment,
+                authorData: enrichedAuthor,
+                replies: enrichedReplies,
+            };
+        }));
     };
 
     return (

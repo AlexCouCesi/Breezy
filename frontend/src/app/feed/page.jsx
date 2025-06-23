@@ -129,7 +129,26 @@ export default function FeedPage() {
     const handleAddComment = async (postId, text) => {
         try {
             const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+
+            const updatedPost = res.data;
+
+            // Récupérer les infos de l’auteur du post
+            let authorData = null;
+            try {
+                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = resAuthor.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            // Enrichir les commentaires du post
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
         } catch (err) {
             console.error('Erreur commentaire', err);
         }
@@ -137,8 +156,32 @@ export default function FeedPage() {
 
     const handleReply = async (postId, commentId, text) => {
         try {
-            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
-            setPosts(posts.map(p => p._id === postId ? res.data : p));
+            const res = await axios.post(
+                `/api/posts/${postId}/comments/${commentId}/reply`,
+                { text },
+                { withCredentials: true }
+            );
+
+            const updatedPost = res.data;
+
+            // Récupérer les infos de l’auteur du post
+            let authorData = null;
+            try {
+                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = resAuthor.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            // Enrichir les commentaires et leurs réponses
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            // Mettre à jour le state avec les données enrichies
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
         } catch (err) {
             console.error('Erreur réponse', err);
         }
