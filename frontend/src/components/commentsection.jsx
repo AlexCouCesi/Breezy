@@ -33,11 +33,11 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
             <div className="mt-4">
                 {comments.map((comment, index) => (
                     <div key={index} className="border-b py-2">
-                        <p className="text-sm font-semibold text-slate-700">{comment.author}</p>
+                        <p className="text-sm font-semibold text-slate-700">{comment.authorData?.username}</p>
                         <p className="text-slate-800">{comment.text}</p>
                         {comment.replies?.map(reply => (
                             <div key={reply._id} className="ml-4 border-l pl-2 mt-2">
-                                <p className="text-sm font-semibold text-slate-700">{reply.author}</p>
+                                <p className="text-sm font-semibold text-slate-700">{reply.authorData?.username}</p>
                                 <p className="text-slate-800">{reply.text}</p>
                             </div>
                         ))}

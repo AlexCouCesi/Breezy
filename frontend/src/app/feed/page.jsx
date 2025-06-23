@@ -30,15 +30,16 @@ export default function FeedPage() {
                 // Enrichit chaque post avec les données de l'auteur
                 const postsWithAuthors = await Promise.all(
                     rawPosts.map(async post => {
+                        let authorData = null;
                         try {
-                            const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
+                            const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
                                 withCredentials: true,
                             });
-                            return { ...post, authorData: userRes.data };
-                        } catch {
-                            // En cas d'erreur, on garde le post mais sans les infos auteur
-                            return { ...post, authorData: null };
-                        }
+                            authorData = res.data;
+                        } catch {}
+
+                        const enrichedComments = await enrichCommentsWithUser(post.comments || []);
+                        return { ...post, authorData, comments: enrichedComments };
                     })
                 );
 
@@ -92,6 +93,38 @@ export default function FeedPage() {
         }
     };
 
+    const enrichCommentsWithUser = async (comments) => {
+        return Promise.all(comments.map(async (comment) => {
+            let enrichedAuthor = null;
+            try {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${comment.author}`, {
+                    withCredentials: true,
+                });
+                enrichedAuthor = res.data;
+            } catch (err) {
+                console.warn("Erreur récupération auteur du commentaire", err);
+            }
+
+            const enrichedReplies = await Promise.all((comment.replies || []).map(async (reply) => {
+                let replyAuthor = null;
+                try {
+                    const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${reply.author}`, {
+                        withCredentials: true,
+                    });
+                    replyAuthor = res.data;
+                } catch (err) {
+                    console.warn("Erreur récupération auteur de la réponse", err);
+                }
+                return { ...reply, authorData: replyAuthor };
+            }));
+
+            return {
+                ...comment,
+                authorData: enrichedAuthor,
+                replies: enrichedReplies,
+            };
+        }));
+    };
 
     const handleAddComment = async (postId, text) => {
         try {
