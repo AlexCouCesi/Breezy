@@ -88,15 +88,6 @@ export default function FeedPage() {
         }
     };
 
-    const handleDelete = async (postId) => {
-        try {
-            await axios.delete(`/api/posts/${postId}`, { withCredentials: true });
-            setPosts(posts.filter(p => p._id !== postId));
-        } catch (err) {
-            console.error('Erreur suppression', err);
-        }
-    };
-
     return (
         <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             <main className="flex-1 p-6 overflow-y-auto space-y-6 max-w-4xl mx-auto">

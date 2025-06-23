@@ -4,13 +4,11 @@ import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
 
-// Composant d'affichage d’un post individuel
 export default function PostCard({ post, onLike, onComment, onReply, onShare, onDelete }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
     const currentUser = useUser();
-    const toggleComments = () => setShowComments((prev) => !prev);
 
     const getUserId = () => {
         const token = Cookies.get('accessToken');
@@ -37,7 +35,6 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
 
     return (
         <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-colors duration-200 rounded-lg shadow-sm mb-4">
-            {/* En-tête : avatar + auteur + date */}
             <div className="flex items-start gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full border-2 border-teal-100 bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center overflow-hidden flex-shrink-0">
                     <img
@@ -60,12 +57,19 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         <span className="text-slate-500">{new Date(post.createdAt).toLocaleString()}</span>
                     </div>
                 </div>
+                {userId === post.author && (
+                    <button
+                        onClick={onDelete}
+                        title="Supprimer"
+                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50 text-sm"
+                    >
+                        Supprimer
+                    </button>
+                )}
             </div>
 
-            {/* Contenu du post */}
             <p className="text-slate-700 leading-relaxed mb-4 italic whitespace-pre-wrap">{post.content}</p>
 
-            {/* Actions : commenter / partager / aimer */}
             <div className="flex items-center gap-6">
                 <button
                     onClick={() => setShowComments(!showComments)}
@@ -78,21 +82,13 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                 </button>
-                {currentUser && post.author === currentUser._id && (
-                    <button
-                        onClick={onDelete}
-                        title="Supprimer"
-                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50"
-                    >
-                        Supprimer
-                    </button>
-                )}
+
                 <button
                     onClick={handleLikeClick}
                     title="Aimer"
                     className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors duration-200 p-2 rounded hover:bg-rose-50"
                 >
-                {liked ? (
+                    {liked ? (
                         <span className="text-red-500">❤️</span>
                     ) : (
                         <img
@@ -103,6 +99,7 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                     )}
                 </button>
             </div>
+
             {showComments && (
                 <div className="mt-4">
                     <CommentSection
@@ -111,7 +108,7 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         onReply={(commentId, text) => onReply(commentId, text)}
                     />
                     <button
-                        onClick={toggleComments}
+                        onClick={() => setShowComments(false)}
                         className="text-sm text-teal-600 mt-2 hover:underline"
                     >
                         Fermer

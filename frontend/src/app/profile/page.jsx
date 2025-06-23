@@ -86,6 +86,16 @@ export default function Profile() {
         }
     };
 
+    const handleDeletePost = async (postId) => {
+        if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+        try {
+            await axios.delete(`/api/posts/${postId}`, { withCredentials: true });
+            setPosts(posts.filter(p => p._id !== postId));
+        } catch (err) {
+            console.error("Erreur suppression", err);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50">
             <div className="max-w-2xl mx-auto px-4 py-8">
@@ -134,6 +144,7 @@ export default function Profile() {
                             onComment={(text) => handleAddComment(post._id, text)}
                             onReply={(commentId, text) => handleReply(post._id, commentId, text)}
                             onShare={() => handleShare(post._id)}
+                            onDelete={() => handleDeletePost(post._id)}
                         />
                     ))}
                 </div>
