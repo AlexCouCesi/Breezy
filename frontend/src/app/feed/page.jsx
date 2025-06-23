@@ -51,6 +51,15 @@ export default function FeedPage() {
         fetchPosts();
     }, []);
 
+    const handleLike = async (postId) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/like`, {}, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur like', err);
+        }
+    };
+
     // Publication d'un nouveau post
     const handlePublish = async () => {
         if (!newContent.trim()) return;
@@ -67,15 +76,6 @@ export default function FeedPage() {
             setNewContent('');
         } catch (err) {
             console.error('Erreur publication', err);
-        }
-    };
-
-    const handleShare = async (postId) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/share`, {}, { withCredentials: true });
-            setPosts([res.data.post, ...posts]);
-        } catch (err) {
-            console.error('Erreur republication', err);
         }
     };
 
@@ -133,7 +133,6 @@ export default function FeedPage() {
                         onLike={() => handleLike(post._id)}
                         onComment={(text) => handleAddComment(post._id, text)}
                         onReply={(commentId, text) => handleReply(post._id, commentId, text)}
-                        onShare={() => handleShare(post._id)}
                         onDelete={() => handleDelete(post._id)}
                     />
                 ))}

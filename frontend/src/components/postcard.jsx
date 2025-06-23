@@ -10,7 +10,6 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
     const currentUser = useUser();
-    const [reposted, setReposted] = useState(false);
     const toggleComments = () => setShowComments((prev) => !prev);
 
     const getUserId = () => {
@@ -97,20 +96,6 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                 </button>
-                {currentUser && post.author !== currentUser._id && (
-                    <button
-                        onClick={() => { onShare(); setReposted(true); }}
-                        title="Republier"
-                        disabled={reposted}
-                        className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 transition-colors duration-200 p-2 rounded hover:bg-emerald-50 disabled:opacity-50"
-                    >
-                        <img
-                            src="/assets/icones_comments/share_icon.png"
-                            alt="Republier"
-                            className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                        />
-                    </button>
-                )}
                 {currentUser && post.author === currentUser._id && (
                     <button
                         onClick={onDelete}

@@ -41,37 +41,6 @@ export const likePost = async (req, res) => {
     }
 };
 
-// Republie ou annule la republication d'un post
-export const sharePost = async (req, res) => {
-    const userId = req.user?.id;
-
-    try {
-        const originalPost = await Post.findById(req.params.id);
-        if (!originalPost) return res.status(404).json({ error: 'Post not found' });
-
-        // Vérifie si l'utilisateur a déjà partagé ce post
-        const alreadyShared = await Post.findOne({ author: userId, repostOf: originalPost._id });
-        if (alreadyShared) {
-            // Supprimer la republication
-            await Post.findByIdAndDelete(alreadyShared._id);
-            return res.status(200).json({ message: 'Republication supprimée' });
-        }
-
-        // Crée un nouveau post de republication
-        const sharedPost = new Post({
-            author: userId,
-            repostOf: originalPost._id,
-            content: '', // Vide ou personnalisé si tu veux laisser un message en plus
-        });
-
-        await sharedPost.save();
-        res.status(201).json({ message: 'Post republicated', post: sharedPost });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
 // Ajoute un commentaire à un post
 export const addComment = async (req, res) => {
     const userId = req.user?.id;

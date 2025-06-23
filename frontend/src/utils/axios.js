@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 // Création d'une instance Axios pour les appels vers l'API principale
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, // Ex: http://localhost:3001
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true, // Envoie automatiquement les cookies (dont le refreshToken)
 });
 
