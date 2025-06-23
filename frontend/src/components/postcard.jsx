@@ -6,7 +6,7 @@ import useUser from '@/utils/useuser';
 
 // Composant d'affichage d’un post individuel
 export default function PostCard({ post, onLike, onComment, onReply, onShare, onDelete }) {
-    const [author, setAuthor] = useState(null);
+    const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
     const currentUser = useUser();
@@ -28,23 +28,6 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
         setLiked(!liked);
         onLike();
     };
-
-    // Récupération des infos de l’auteur du post au chargement
-    useEffect(() => {
-        async function fetchAuthor() {
-            try {
-                const res = await axios.get(
-                    `${process.env.NEXT_PUBLIC_AUTH_URL}/users/${post.author}`,
-                    { withCredentials: true }
-                );
-                setAuthor(res.data);
-            } catch (error) {
-                console.error('Erreur de récupération de l’auteur :', error);
-            }
-        }
-
-        fetchAuthor();
-    }, [post.author]);
 
     useEffect(() => {
         if (userId) {
@@ -72,8 +55,7 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium text-slate-800">{author?.username || 'Utilisateur'}</span>
-                        <span className="text-teal-600">@{author?.username || 'inconnu'}</span>
+                        <span className="font-medium text-slate-800">{author?.username}</span>
                         <span className="text-slate-500">•</span>
                         <span className="text-slate-500">{new Date(post.createdAt).toLocaleString()}</span>
                     </div>

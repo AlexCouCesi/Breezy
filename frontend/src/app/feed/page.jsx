@@ -31,7 +31,7 @@ export default function FeedPage() {
                 const postsWithAuthors = await Promise.all(
                     rawPosts.map(async post => {
                         try {
-                            const userRes = await axios.get(`/api/auth/users/${post.author}`, {
+                            const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
                                 withCredentials: true,
                             });
                             return { ...post, authorData: userRes.data };
