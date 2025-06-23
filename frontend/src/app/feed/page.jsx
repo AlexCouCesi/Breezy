@@ -88,6 +88,25 @@ export default function FeedPage() {
         }
     };
 
+    const handleReply = async (postId, commentId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
+            setPosts(posts.map(p => p._id === postId ? res.data : p));
+        } catch (err) {
+            console.error('Erreur réponse', err);
+        }
+    };
+
+    const handleDelete = async (postId) => {
+        if (!confirm("Êtes-vous sûr de vouloir supprimer ce post ?")) return;
+        try {
+            await axios.delete(`/api/posts/${postId}`, { withCredentials: true });
+            setPosts(posts.filter(p => p._id !== postId));
+        } catch (err) {
+            console.error("Erreur suppression", err);
+        }
+    };
+
     return (
         <div className="flex h-screen bg-gradient-to-br from-slate-50 to-blue-50">
             <main className="flex-1 p-6 overflow-y-auto space-y-6 max-w-4xl mx-auto">
