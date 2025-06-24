@@ -119,35 +119,27 @@ export const deleteComment = async (req, res) => {
     const userId = req.user?.id;
     const { postId, commentId } = req.params;
 
-    console.log("🧪 Tentative suppression commentaire :", { postId, commentId, userId });
-
     try {
         const post = await Post.findById(postId);
         if (!post) {
-            console.warn("❌ Post introuvable :", postId);
             return res.status(404).json({ error: 'Post introuvable' });
         }
 
         const comment = post.comments.id(commentId);
         if (!comment) {
-            console.warn("❌ Commentaire introuvable :", commentId);
             return res.status(404).json({ error: 'Commentaire introuvable' });
         }
 
         if (comment.author.toString() !== userId) {
-            console.warn("⛔ Utilisateur non autorisé :", userId);
             return res.status(403).json({ error: 'Action non autorisée' });
         }
 
-        // ✅ Supprime proprement le commentaire sans .remove()
         post.comments = post.comments.filter(c => c._id.toString() !== commentId);
         await post.save();
 
-        // Recharge le post mis à jour
         const updatedPost = await Post.findById(postId);
         res.status(200).json(updatedPost);
     } catch (err) {
-        console.error("🔥 Erreur lors de deleteComment :", err);
         res.status(500).json({ error: 'Erreur serveur : ' + err.message });
     }
 };
@@ -156,41 +148,33 @@ export const deleteReply = async (req, res) => {
     const userId = req.user?.id;
     const { postId, commentId, replyId } = req.params;
 
-    console.log("🧪 Tentative suppression réponse :", { postId, commentId, replyId, userId });
-
     try {
         const post = await Post.findById(postId);
         if (!post) {
-            console.warn("❌ Post introuvable :", postId);
             return res.status(404).json({ error: 'Post introuvable' });
         }
 
         const comment = post.comments.id(commentId);
         if (!comment) {
-            console.warn("❌ Commentaire introuvable :", commentId);
             return res.status(404).json({ error: 'Commentaire introuvable' });
         }
 
         const reply = comment.replies.id(replyId);
         if (!reply) {
-            console.warn("❌ Réponse introuvable :", replyId);
             return res.status(404).json({ error: 'Réponse introuvable' });
         }
 
         if (reply.author.toString() !== userId) {
-            console.warn("⛔ Utilisateur non autorisé à supprimer la réponse");
             return res.status(403).json({ error: 'Action non autorisée' });
         }
 
-        // Supprimer proprement sans utiliser .remove()
         comment.replies = comment.replies.filter(r => r._id.toString() !== replyId);
         await post.save();
 
-        // Recharger le post mis à jour
         const updatedPost = await Post.findById(postId);
         res.status(200).json(updatedPost);
     } catch (err) {
-        console.error("🔥 Erreur lors de deleteReply :", err);
         res.status(500).json({ error: 'Erreur serveur : ' + err.message });
     }
 };
+
