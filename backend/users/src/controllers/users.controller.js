@@ -79,11 +79,6 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-// TODO : bannir un utilisateur
-export const banUser = async (req, res) => {
-    res.status(200).json({ message: `Utilisateur ${req.params.id} banni` });
-};
-
 // Suivre un autre utilisateur
 export const followUser = async (req, res) => {
     const followerId = req.user._id;       // L'utilisateur connecté

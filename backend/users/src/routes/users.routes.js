@@ -7,7 +7,6 @@ import {
     getConnectedUser,
     updateUser,
     deleteUser,
-    banUser,
     followUser,
     unfollowUser,
 } from '../controllers/users.controller.js';
@@ -39,9 +38,6 @@ router.put('/:id', isSelfOrAdmin, upload.single('photo'), updateUser);
 
 // Supprimer un utilisateur
 router.delete('/:id', isSelfOrAdmin, deleteUser);
-
-// Bannir un utilisateur (réservé aux admins et modérateurs)
-router.post('/:id/ban', requireRole('admin', 'moderator'), banUser);
 
 // Suivre un utilisateur (rôle requis : user ou plus)
 router.post('/:id/follow', requireRole('user', 'moderator', 'admin'), followUser);
