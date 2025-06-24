@@ -34,41 +34,6 @@ export default function LoginPage() {
         }
     };
 
-    // Vérifie la présence d'un token de rafraîchissement pour connecter automatiquement l'utilisateur
-    useEffect(() => {
-        const checkRefreshToken = async () => {
-            try {
-                const res = await api.get('/refresh');
-
-                if (res.data?.accessToken) {
-                    Cookies.set('accessToken', res.data.accessToken, {
-                        expires: 1,
-                        secure: true,
-                        sameSite: 'strict',
-                    });
-
-                    router.push('/feed');
-                    router.refresh();
-                } else {
-                    setLoading(false);
-                }
-            } catch {
-                setLoading(false);
-            }
-        };
-
-        checkRefreshToken();
-    }, [router]);
-
-    // Affiche un écran de chargement pendant la vérification du token
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <p className="text-white text-xl">Chargement...</p>
-            </div>
-        );
-    }
-
     // Formulaire de connexion
     return (
         <div className="flex items-center justify-center h-screen bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 px-4">

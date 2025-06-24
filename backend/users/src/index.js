@@ -1,12 +1,16 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users.routes.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 // Middleware global : parse les corps JSON
 app.use(express.json());
+
+// Middleware pour parser les cookies
+app.use(cookieParser());
 
 // Route principale pour la gestion des utilisateurs
 app.use('/api/users', usersRouter);
