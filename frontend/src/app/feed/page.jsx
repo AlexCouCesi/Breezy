@@ -231,30 +231,30 @@ export default function FeedPage() {
 
     const handleDeleteReply = async (postId, commentId, replyId) => {
         if (!confirm("Supprimer cette réponse ?")) return;
+        try {
+            const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
+                withCredentials: true,
+            });
+            const updatedPost = res.data;
+
+            let authorData = null;
             try {
-                const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
+                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
                     withCredentials: true,
                 });
-                const updatedPost = res.data;
-
-                let authorData = null;
-                try {
-                    const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
-                        withCredentials: true,
-                    });
-                    authorData = resAuthor.data;
-                } catch (err) {
-                    console.error("Erreur récupération de l’auteur du post", err);
-                }
-
-                const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
-
-                setPosts(posts.map(p =>
-                    p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
-                ));
+                authorData = resAuthor.data;
             } catch (err) {
-                console.error("Erreur suppression réponse", err);
+                console.error("Erreur récupération de l’auteur du post", err);
             }
+
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
+        } catch (err) {
+            console.error("Erreur suppression réponse", err);
+        }
     };
 
     return (

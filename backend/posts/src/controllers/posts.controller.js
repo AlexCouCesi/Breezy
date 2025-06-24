@@ -156,25 +156,41 @@ export const deleteReply = async (req, res) => {
     const userId = req.user?.id;
     const { postId, commentId, replyId } = req.params;
 
+    console.log("🧪 Tentative suppression réponse :", { postId, commentId, replyId, userId });
+
     try {
         const post = await Post.findById(postId);
-        if (!post) return res.status(404).json({ error: 'Post introuvable' });
+        if (!post) {
+            console.warn("❌ Post introuvable :", postId);
+            return res.status(404).json({ error: 'Post introuvable' });
+        }
 
         const comment = post.comments.id(commentId);
-        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+        if (!comment) {
+            console.warn("❌ Commentaire introuvable :", commentId);
+            return res.status(404).json({ error: 'Commentaire introuvable' });
+        }
 
         const reply = comment.replies.id(replyId);
-        if (!reply) return res.status(404).json({ error: 'Réponse introuvable' });
+        if (!reply) {
+            console.warn("❌ Réponse introuvable :", replyId);
+            return res.status(404).json({ error: 'Réponse introuvable' });
+        }
 
         if (reply.author.toString() !== userId) {
+            console.warn("⛔ Utilisateur non autorisé à supprimer la réponse");
             return res.status(403).json({ error: 'Action non autorisée' });
         }
 
-        reply.remove();
+        // Supprimer proprement sans utiliser .remove()
+        comment.replies = comment.replies.filter(r => r._id.toString() !== replyId);
         await post.save();
 
-        res.status(200).json(post);
+        // Recharger le post mis à jour
+        const updatedPost = await Post.findById(postId);
+        res.status(200).json(updatedPost);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("🔥 Erreur lors de deleteReply :", err);
+        res.status(500).json({ error: 'Erreur serveur : ' + err.message });
     }
 };
