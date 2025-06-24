@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
-import useUser from '@/utils/useuser';
 
 export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
-    const currentUser = useUser();
 
     const getUserId = () => {
         const token = Cookies.get('accessToken');

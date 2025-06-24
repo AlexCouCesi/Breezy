@@ -33,11 +33,11 @@ export default function LayoutClient({ children }) {
         const fetchUser = async () => {
             try {
                 const res = await axios.get('/api/users/me', { withCredentials: true });
-                console.log('Utilisateur connecté:', res.data);
                 // Si l'utilisateur n'est pas trouvé, redirige vers la page de connexion
                 if (!res.data) {
-                    // router.replace('/auth/login');
-                } else {
+                    // router.replace('/auth/login');th/login');
+              
+                 } else {
                     return setUser(res.data);
                 }
             } catch (err) {
