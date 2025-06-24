@@ -13,22 +13,6 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
 
     return (
         <div className="mt-4">
-            {/* Champ de saisie du commentaire */}
-            <textarea
-                className="w-full p-2 border rounded text-slate-900 placeholder-slate-500"
-                placeholder="Écrire ici..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-            />
-
-            {/* Bouton de publication */}
-            <button
-                className="bg-black text-white px-4 py-1 rounded mt-2"
-                onClick={handleSubmit}
-            >
-                Publier
-            </button>
-
             {/* Liste des commentaires existants */}
             <div className="mt-4">
                 {comments.map((comment, index) => (
@@ -44,7 +28,7 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
 
                         {onReply && (
                             <div className="mt-2 ml-4">
-                                <textarea
+                                {/*<textarea
                                     className="w-full p-1 border rounded text-slate-900 placeholder-slate-500"
                                     placeholder="Répondre..."
                                     value={replies[comment._id] || ''}
@@ -60,6 +44,7 @@ export default function CommentSection({ comments, onAddComment, onReply }) {
                                 >
                                     Répondre
                                 </button>
+                                */}
                             </div>
                         )}
                     </div>

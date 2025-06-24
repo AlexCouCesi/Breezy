@@ -3,6 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
+import ReplyPopup from './reply-popup';
 
 // Composant d'affichage d’un post individuel
 export default function PostCard({ post, onLike, onComment, onReply, onShare, onDelete }) {
@@ -87,15 +88,35 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
             <div className="flex items-center gap-6">
                 <button
                     onClick={() => setShowComments(!showComments)}
-                    title="Commenter"
+                    title="Voir les commentaires"
                     className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
                 >
                     <img
-                        src="/assets/icones_comments/comment_icon.png"
-                        alt="Commenter"
+                        src="/assets/icones_comments/allComments_icon.png"
+                        alt="Voir les commentaires"
                         className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                 </button>
+
+                <ReplyPopup
+                    originalMessage={post.content}
+                    authorName={author?.username || 'Utilisateur'}
+                    onReply={(replyText) => onComment(replyText)}
+                    trigger={
+                        <button
+                            title="Commenter"
+                            className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
+                        >
+                            <img
+                                src="/assets/icones_comments/comment_icon.png"
+                                alt="Commenter"
+                                className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
+                            />
+                        </button>
+                    }
+                />
+
+
                 {currentUser && post.author === currentUser._id && (
                     <button
                         onClick={onDelete}
@@ -129,11 +150,13 @@ export default function PostCard({ post, onLike, onComment, onReply, onShare, on
                         onReply={(commentId, text) => onReply(commentId, text)}
                     />
                     <button
+                        variant="ghost"
+                        size="sm"
                         onClick={toggleComments}
-                        className="text-sm text-teal-600 mt-2 hover:underline"
+                        className="mt-4 text-teal-600 hover:text-teal-700 hover:bg-teal-50 transition-colors duration-200 "
                     >
                         Fermer
-                    </button>
+                    </button>                    
                 </div>
             )}
         </div>
