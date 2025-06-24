@@ -7,45 +7,29 @@ const api = axios.create({
   withCredentials: true, // Envoie automatiquement les cookies (dont le refreshToken)
 });
 
-// Intercepteur de réponse : tente un refresh automatique si 401
 api.interceptors.response.use(
   response => response,
-
   async error => {
     const originalRequest = error.config;
-
-    // Si erreur 401 (unauthorized) et qu’on n’a pas déjà tenté un refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Vérifie si _retry est défini, sinon le considère comme false
+    const hasRetried = typeof originalRequest._retry !== 'undefined' ? originalRequest._retry : false;
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
       originalRequest._retry = true;
-
-      try {
-        // Appelle le endpoint de refresh côté auth (le refreshToken est en cookie HttpOnly)
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_AUTH_URL}/api/auth/refresh`,
-          {},
-          { withCredentials: true }
+      // Appelle la route de refresh
+      const res = await axios.get('/api/auth/refresh', { withCredentials: true });
+      if (res.status === 200) {
+        Cookies.set('accessToken', res.data.accessToken, {
+            expires: 1,
+            secure: true,
+            sameSite: 'strict',
+          }
         );
-
-        const newAccessToken = res.data.accessToken;
-
-        // Stocke le nouveau accessToken dans les cookies (visible JS si besoin, sinon juste en mémoire)
-        Cookies.set('accessToken', newAccessToken, {
-          secure: true,
-          sameSite: 'strict',
-        });
-
-        // Met à jour le header Authorization pour la requête originale
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-
-        // Renvoie la requête initiale avec le nouveau token
+        // Mets à jour le header Authorization si besoin
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken;
+        originalRequest.headers['Authorization'] = 'Bearer ' + res.data.accessToken;
         return api(originalRequest);
-      } catch (refreshError) {
-        // Si le refresh échoue, l'utilisateur est probablement déconnecté → rediriger
-        window.location.href = '/auth/login';
       }
     }
-
-    // Dans les autres cas, on laisse passer l'erreur
     return Promise.reject(error);
   }
 );

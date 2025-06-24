@@ -5,7 +5,7 @@ import SideMenu from '@/components/sidemenu';
 import FollowedList from './followedlist';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import axios from '@/utils/axios';
 
 
 // Layout côté client : affiche ou masque le SideMenu selon la page
