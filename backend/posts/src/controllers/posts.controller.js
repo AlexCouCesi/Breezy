@@ -119,22 +119,36 @@ export const deleteComment = async (req, res) => {
     const userId = req.user?.id;
     const { postId, commentId } = req.params;
 
+    console.log("🧪 Tentative suppression commentaire :", { postId, commentId, userId });
+
     try {
         const post = await Post.findById(postId);
-        if (!post) return res.status(404).json({ error: 'Post introuvable' });
+        if (!post) {
+            console.warn("❌ Post introuvable :", postId);
+            return res.status(404).json({ error: 'Post introuvable' });
+        }
 
         const comment = post.comments.id(commentId);
-        if (!comment) return res.status(404).json({ error: 'Commentaire introuvable' });
+        if (!comment) {
+            console.warn("❌ Commentaire introuvable :", commentId);
+            return res.status(404).json({ error: 'Commentaire introuvable' });
+        }
 
         if (comment.author.toString() !== userId) {
+            console.warn("⛔ Utilisateur non autorisé :", userId);
             return res.status(403).json({ error: 'Action non autorisée' });
         }
 
-        comment.remove(); // Supprime le sous-document
+        // ✅ Supprime proprement le commentaire sans .remove()
+        post.comments = post.comments.filter(c => c._id.toString() !== commentId);
         await post.save();
-        res.status(200).json(post);
+
+        // Recharge le post mis à jour
+        const updatedPost = await Post.findById(postId);
+        res.status(200).json(updatedPost);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("🔥 Erreur lors de deleteComment :", err);
+        res.status(500).json({ error: 'Erreur serveur : ' + err.message });
     }
 };
 
