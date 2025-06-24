@@ -6,14 +6,14 @@ import Link from 'next/link';
 export default function FollowedList({ followingList }) {
     if (!followingList || followingList.length === 0) {
         return (
-            <aside className="w-80 bg-white border-l p-6 hidden lg:block">
+            <aside className="w-80 bg-white border-l p-6 hidden lg:block h-screen">
                 <h2 className="text-xl font-semibold mb-4">Comptes suivis</h2>
                 <p className="text-gray-500">Vous ne suivez aucun compte pour l'instant. :(</p>
             </aside>
         );
     } else {
         return (
-            <aside className="w-80 bg-white border-l p-6 hidden lg:block">
+            <aside className="w-80 bg-white border-l p-6 hidden lg:block h-screen">
                 <h2 className="text-xl font-semibold mb-4">Comptes suivis</h2>
                 <ul className="space-y-4">
                     {followingList.map((user, index) => (
