@@ -33,6 +33,18 @@ export const getUserById = async (req, res) => {
     }
 };
 
+// Récupère l'utilisateur connecté (via le token JWT)
+export const getConnectedUser = async (req, res) => {
+    try {
+        const userId = req.user._id; // L'ID de l'utilisateur est extrait du token JWT
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' + userId });
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
 // Met à jour un utilisateur
 export const updateUser = async (req, res) => {
     try {
@@ -74,7 +86,7 @@ export const banUser = async (req, res) => {
 
 // Suivre un autre utilisateur
 export const followUser = async (req, res) => {
-    const followerId = req.user.id;       // L'utilisateur connecté
+    const followerId = req.user._id;       // L'utilisateur connecté
     const followedId = req.params.id;     // L'utilisateur à suivre
 
     if (!followerId) {

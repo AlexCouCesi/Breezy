@@ -30,7 +30,7 @@ export function requireRole(...roles) {
 			next();
 		} catch (err) {
 			// Erreur d'appel ou token invalide
-			return res.status(401).json({ error: 'Non authentifié '});
+			return res.status(401).json({ error: 'Non authentifié ' + err.message });
 		}
 	};
 }
@@ -54,19 +54,23 @@ export async function isSelfOrAdmin(req, res, next) {
 
 async function authenticateUser(req, res) {
 	// Récupère le token JWT depuis les headers
-	const token = req.headers.authorization;
-	if (!token) {
-		throw new Error('Token manquant');
-	}
+	let token;
+    const authHeader = req.headers["authorization"];
+    if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+    } else if (req.cookies?.accessToken) {
+        token = req.cookies.accessToken;
+    }
 
 	// Appelle le service d'auth pour authentifier l'utilisateur
 	try {
+		console.log('Authentification avec token:', token);
 		const response = await axios.get('http://auth:4000/api/auth/authenticate', {
-			headers: { Authorization: token }
+			headers: { Authorization: 'Bearer ' + token }
 		});
 		// Attache l'utilisateur à req pour l'exploiter dans les contrôleurs suivants
 		req.user = response.data;
 	} catch (error) {
-		throw new Error('Token invalide ou authentification échouée ');
+		throw new Error('Token invalide ou authentification échouée ' + error.message);
 	}
 }

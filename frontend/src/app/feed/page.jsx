@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import PostCard from '@/components/postcard';
-import FollowedList from '@/components/followedlist';
 
 export default function FeedPage() {
     const [posts, setPosts] = useState([]);
@@ -266,6 +265,7 @@ export default function FeedPage() {
                 <div className="bg-white border rounded-xl shadow p-4">
                     <div className="flex gap-4">
                         {/* Avatar (statique pour l'instant) */}
+                        
                         <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0" />
                         <textarea
                             placeholder="Comment ça va ?"
@@ -300,10 +300,6 @@ export default function FeedPage() {
                 ))}
             </main>
 
-            {/* Sidebar : utilisateurs suivis */}
-            <aside className="w-80 bg-white border-l p-6 hidden lg:block">
-                <FollowedList />
-            </aside>
         </div>
     );
 }
