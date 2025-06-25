@@ -60,38 +60,6 @@ export default function FeedPage(currentUser) {
         }
     };
 
-    // Publication d'un nouveau post
-    const handlePublish = async () => {
-        if (!newContent.trim()) return;
-
-        try {
-            const res = await axios.post(
-                '/api/posts/',
-                { content: newContent },
-                { withCredentials: true }
-            );
-
-            const newPost = res.data.post;
-
-            // Récupère les infos de l’auteur
-            let authorData = null;
-            try {
-                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${newPost.author}`, {
-                    withCredentials: true,
-                });
-                authorData = userRes.data;
-            } catch (err) {
-                console.error("Erreur récupération de l’auteur", err);
-            }
-
-            // Ajoute le post avec les données enrichies
-            setPosts([{ ...newPost, authorData }, ...posts]);
-            setNewContent('');
-        } catch (err) {
-            console.error('Erreur publication', err);
-        }
-    };
-
     const enrichCommentsWithUser = async (comments) => {
         return Promise.all(comments.map(async (comment) => {
             if (!comment?.author) return comment; // <--- Ajoute cette ligne
@@ -156,7 +124,61 @@ export default function FeedPage(currentUser) {
             console.error('Erreur commentaire', err);
         }
     };
+    const [selectedImage, setSelectedImage] = useState(null);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+        }
+    };
+
+    // Modifie handlePublish pour envoyer l'image si présente
+    const handlePublish = async () => {
+        if (!newContent.trim() && !selectedImage) return;
+
+        try {
+            let postData;
+            let headers = { withCredentials: true };
+
+            if (selectedImage) {
+                postData = new FormData();
+                postData.append('content', newContent);
+                postData.append('image', selectedImage);
+                headers = {
+                    ...headers,
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                };
+            } else {
+                postData = { content: newContent };
+            }
+
+            const res = await axios.post(
+                '/api/posts/',
+                postData,
+                headers
+            );
+
+            const newPost = res.data.post;
+
+            // Récupère les infos de l’auteur
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${newPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur", err);
+            }
+
+            setPosts([{ ...newPost, authorData }, ...posts]);
+            setNewContent('');
+            setSelectedImage(null);
+        } catch (err) {
+            console.error('Erreur publication', err);
+        }
+    };
     const handleReply = async (postId, commentId, text) => {
         try {
             const res = await axios.post(
@@ -265,25 +287,57 @@ export default function FeedPage(currentUser) {
                 <div className="bg-white border rounded-xl shadow p-4">
                     <div className="flex gap-4">
                         {/* Avatar */}
-                        
                         <img
                             src={
-                            currentUser.profilePicture
-                                ? `${process.env.NEXT_PUBLIC_API_URL}/${currentUser.profilePicture}`
-                                : `${process.env.NEXT_PUBLIC_API_URL}/assets/icones_divers/profile_icon.png`
+                                currentUser.profilePicture
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}/${currentUser.profilePicture}`
+                                    : `${process.env.NEXT_PUBLIC_API_URL}/assets/icones_divers/profile_icon.png`
                             }
                             alt={currentUser.username}
                             className="w-10 h-10 rounded-full object-cover bg-gray-300"
                         />
-                        <textarea
-                            placeholder="Comment ça va ?"
-                            className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
-                            rows={3}
-                            value={newContent}
-                            onChange={e => setNewContent(e.target.value)}
-                        />
+                        <div className="flex flex-col items-center w-full">
+                            {selectedImage && (
+                                <img
+                                    src={URL.createObjectURL(selectedImage)}
+                                    alt="Aperçu"
+                                    className="w-full max-h-96 object-contain border rounded-lg"
+                                    style={{ marginBottom: '0.5rem' }}
+                                />
+                            )}
+                            <textarea
+                                placeholder="Comment ça va ?"
+                                className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
+                                rows={3}
+                                value={newContent}
+                                onChange={e => setNewContent(e.target.value)}
+                            />
+                        </div>
                     </div>
-                    <div className="flex justify-end mt-2">
+                    <div className="flex justify-end mt-2 gap-2">
+                        {selectedImage && (
+                            <button
+                                type="button"
+                                onClick={() => setSelectedImage(null)}
+                                className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded cursor-pointer transition-colors"
+                            >
+                                Supprimer
+                            </button>
+                        )}
+                        <label
+                            htmlFor="image-upload"
+                            className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded cursor-pointer transition-colors"
+                            style={{ display: 'inline-block' }}
+                        >
+                            {selectedImage ? "Changer d'image" : "Choisir une image"}
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                        </label>
                         <button
                             onClick={handlePublish}
                             className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded"
@@ -292,8 +346,6 @@ export default function FeedPage(currentUser) {
                         </button>
                     </div>
                 </div>
-
-                {/* Liste des posts */}
                 {posts.map(post => (
                     <PostCard
                         key={post._id}
@@ -307,7 +359,5 @@ export default function FeedPage(currentUser) {
                     />
                 ))}
             </main>
-
         </div>
-    );
-}
+    )}
