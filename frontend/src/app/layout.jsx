@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Breezy",
   description: "Réseau social léger",
-    icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 // Layout racine de l'application (appliqué à toutes les routes)

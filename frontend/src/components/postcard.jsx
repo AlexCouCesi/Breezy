@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
-import useUser from '@/utils/useuser';
-//import ReplyPopup from './reply-popup';
-import ReplyButton from './replybutton';
 
 export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
-    const currentUser = useUser();
+
     const getUserId = () => {
         const token = Cookies.get('accessToken');
         if (!token) return null;
@@ -90,32 +87,16 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
             <div className="flex items-center gap-6">
                 <button
                     onClick={() => setShowComments(!showComments)}
-                    title="Voir les commentaires"
+                    title="Commenter"
                     className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
                 >
                     <img
-                        src="/assets/icones_comments/allComments_icon.png"
-                        alt="Voir les commentaires"
+                        src="/assets/icones_comments/comment_icon.png"
+                        alt="Commenter"
                         className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
                     />
                 </button>
 
-                <ReplyButton
-                    postContent={post.content}
-                    authorUsername={author?.username}
-                    onReply={(replyText) => onComment(replyText)}
-                />
-
-
-                {currentUser && post.author === currentUser._id && (
-                    <button
-                        onClick={onDelete}
-                        title="Supprimer"
-                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50"
-                    >
-                        Supprimer
-                    </button>
-                )}
                 <button
                     onClick={handleLikeClick}
                     title="Aimer"
@@ -143,13 +124,11 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                         onDeleteReply={(commentId, replyId) => onDeleteReply(post._id, commentId, replyId)}
                     />
                     <button
-                        variant="ghost"
-                        size="sm"
                         onClick={() => setShowComments(false)}
-                        className="mt-4 text-teal-600 hover:text-teal-700 hover:bg-teal-50 transition-colors duration-200 "
+                        className="text-sm text-teal-600 mt-2 hover:underline"
                     >
                         Fermer
-                    </button>                    
+                    </button>
                 </div>
             )}
         </div>
