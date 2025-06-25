@@ -13,14 +13,14 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
 
-    // Connexion manuelle de l'utilisateur
     const handleLogin = async () => {
         try {
+            setErrorMessage(''); // Réinitialiser le message d'erreur
             const res = await api.post('/login', { email, password });
 
-            // Stockage sécurisé du token dans les cookies
             Cookies.set('accessToken', res.data.accessToken, {
                 expires: 1,
                 secure: true,
@@ -30,11 +30,10 @@ export default function LoginPage() {
             router.push('/feed');
             router.refresh();
         } catch (error) {
-            alert('Erreur de connexion : ' + (error.response?.data?.error || 'Erreur serveur'));
+            setErrorMessage(error.response?.data?.error || 'Identifiants invalides');
         }
     };
 
-    // Vérifie la présence d'un token de rafraîchissement pour connecter automatiquement l'utilisateur
     useEffect(() => {
         const checkRefreshToken = async () => {
             try {
@@ -60,7 +59,6 @@ export default function LoginPage() {
         checkRefreshToken();
     }, [router]);
 
-    // Affiche un écran de chargement pendant la vérification du token
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -69,7 +67,6 @@ export default function LoginPage() {
         );
     }
 
-    // Formulaire de connexion
     return (
         <div className="flex items-center justify-center h-screen bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 px-4">
             <div className="flex justify-center items-center w-full max-w-5xl">
@@ -90,9 +87,15 @@ export default function LoginPage() {
                             onChange={e => setPassword(e.target.value)}
                         />
                     </FormGroup>
+
+                    {errorMessage && (
+                        <p className="text-red-600 text-sm mt-2">{errorMessage}</p>
+                    )}
+
                     <Button onClick={handleLogin} className="mt-6 w-full">
                         Se connecter
                     </Button>
+
                     <p className="mt-4 text-center text-sm text-zinc-600">
                         Pas encore de compte ?{' '}
                         <span

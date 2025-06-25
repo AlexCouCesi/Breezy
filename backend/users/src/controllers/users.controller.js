@@ -135,3 +135,16 @@ export const unfollowUser = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+// Récupérer la liste des comptes suivis par un utilisateur
+export const getFollowing = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).populate('following', 'username avatar');
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(user.following);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

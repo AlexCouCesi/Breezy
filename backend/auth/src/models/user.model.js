@@ -30,7 +30,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'moderator', 'admin'],
         default: 'user'
-    }
+    },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
     timestamps: true        // Ajoute automatiquement createdAt et updatedAt
 });

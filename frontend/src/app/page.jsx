@@ -105,13 +105,17 @@ export default function Home() {
 
             {/* Bas de carte : infos légales */}
             <div className="text-center mt-8 pt-6 border-t border-gray-100">
-              <p className="text-gray-500 text-sm">
-                En continuant, vous acceptez nos{" "}
-                <span className="text-teal-600 hover:text-teal-700 cursor-pointer font-medium">
-                  conditions d'utilisation
-                </span>
-              </p>
-            </div>
+                <p className="text-gray-500 text-sm">
+                En continuant, vous acceptez nos{' '}
+                <a
+                href="https://policies.google.com/terms?hl=fr-CA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-teal-600 hover:text-teal-700 cursor-pointer font-medium"> conditions d'utilisation
+    </a>
+  </p>
+</div>
+
           </div>
 
           {/* Version mobile : logo en bas */}

@@ -1,121 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import CommentSection from './commentsection';
-import useUser from '@/utils/useuser';
+import React from 'react';
 
-export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
-    const author = post.authorData;
-    const [showComments, setShowComments] = useState(false);
-    const [liked, setLiked] = useState(false);
-    const currentUser = useUser();
-
-    const getUserId = () => {
-        const token = Cookies.get('accessToken');
-        if (!token) return null;
-        try {
-            return JSON.parse(atob(token.split('.')[1])).id;
-        } catch {
-            return null;
-        }
-    };
-
-    const userId = getUserId();
-
-    const handleLikeClick = () => {
-        setLiked(!liked);
-        onLike();
-    };
-
-    useEffect(() => {
-        if (userId) {
-            setLiked(post.likes?.includes(userId));
-        }
-    }, [post.likes, userId]);
-
+export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply, onFollow, isFollowing }) {
     return (
-        <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-colors duration-200 rounded-lg shadow-sm mb-4">
-            <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full border-2 border-teal-100 bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                    <img
-                        src={author?.avatar || '/assets/icones_divers/profile_icon.png'}
-                        alt="Photo de profil"
-                        className="w-full h-full object-cover"
-                        onError={e => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'flex';
-                        }}
-                    />
-                    <div className="hidden w-full h-full items-center justify-center text-sm font-semibold text-teal-700">
-                        PP
-                    </div>
+        <div className="bg-white border rounded-xl shadow p-4 space-y-2">
+            <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full" />
+                    <span className="font-bold text-slate-800">@{post.authorData?.username}</span>
+                    {!isFollowing && post.authorData && (
+                        <button
+                            onClick={onFollow}
+                            className="text-sm text-teal-600 hover:underline ml-2"
+                        >
+                            S'abonner
+                        </button>
+                    )}
                 </div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium text-slate-800">{author?.username}</span>
-                        <span className="text-slate-500">•</span>
-                        <span className="text-slate-500">{new Date(post.createdAt).toLocaleString()}</span>
-                    </div>
-                </div>
-                {userId === post.author && (
-                    <button
-                        onClick={onDelete}
-                        title="Supprimer"
-                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50 text-sm"
-                    >
-                        Supprimer
-                    </button>
+                <div className="text-gray-500 text-sm">{new Date(post.createdAt).toLocaleString()}</div>
+            </div>
+
+            <p className="text-slate-700">{post.content}</p>
+
+            <div className="flex gap-4 text-sm text-gray-500 mt-2">
+                <button onClick={onLike} className="hover:underline">👍 {post.likes?.length || 0}</button>
+                <button onClick={() => onComment('')} className="hover:underline">💬 {post.comments?.length || 0}</button>
+                {onDelete && (
+                    <button onClick={onDelete} className="hover:underline text-red-500">Supprimer</button>
                 )}
             </div>
 
-            <p className="text-slate-700 leading-relaxed mb-4 italic whitespace-pre-wrap">{post.content}</p>
+            {/* Commentaires */}
+            {post.comments && post.comments.map(comment => (
+                <div key={comment._id} className="ml-6 mt-2 border-l pl-2">
+                    <div className="flex justify-between items-center">
+                        <span className="font-semibold">@{comment.authorData?.username}</span>
+                        <button onClick={() => onDeleteComment(post._id, comment._id)} className="text-xs text-red-500">Supprimer</button>
+                    </div>
+                    <p>{comment.text}</p>
 
-            <div className="flex items-center gap-6">
-                <button
-                    onClick={() => setShowComments(!showComments)}
-                    title="Commenter"
-                    className="flex items-center gap-2 text-slate-500 hover:text-teal-600 transition-colors duration-200 p-2 rounded hover:bg-teal-50"
-                >
-                    <img
-                        src="/assets/icones_comments/comment_icon.png"
-                        alt="Commenter"
-                        className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                    />
-                </button>
+                    {/* Réponses */}
+                    {comment.replies && comment.replies.map(reply => (
+                        <div key={reply._id} className="ml-4 mt-1 border-l pl-2">
+                            <div className="flex justify-between items-center">
+                                <span className="font-semibold">@{reply.authorData?.username}</span>
+                                <button onClick={() => onDeleteReply(post._id, comment._id, reply._id)} className="text-xs text-red-500">Supprimer</button>
+                            </div>
+                            <p>{reply.text}</p>
+                        </div>
+                    ))}
 
-                <button
-                    onClick={handleLikeClick}
-                    title="Aimer"
-                    className="flex items-center gap-2 text-slate-500 hover:text-rose-500 transition-colors duration-200 p-2 rounded hover:bg-rose-50"
-                >
-                    {liked ? (
-                        <span className="text-red-500">❤️</span>
-                    ) : (
-                        <img
-                            src="/assets/icones_comments/heart_icon.png"
-                            alt="Aimer"
-                            className="w-5 h-5 opacity-60 hover:opacity-100 transition-opacity"
-                        />
-                    )}
-                </button>
-            </div>
-
-            {showComments && (
-                <div className="mt-4">
-                    <CommentSection
-                        comments={post.comments || []}
-                        onAddComment={(text) => onComment(text)}
-                        onReply={(commentId, text) => onReply(commentId, text)}
-                        onDeleteComment={(commentId) => onDeleteComment(post._id, commentId)}
-                        onDeleteReply={(commentId, replyId) => onDeleteReply(post._id, commentId, replyId)}
-                    />
-                    <button
-                        onClick={() => setShowComments(false)}
-                        className="text-sm text-teal-600 mt-2 hover:underline"
-                    >
-                        Fermer
-                    </button>
+                    <button onClick={() => onReply(comment._id, '')} className="text-xs text-teal-600 hover:underline mt-1">Répondre</button>
                 </div>
-            )}
+            ))}
         </div>
     );
 }

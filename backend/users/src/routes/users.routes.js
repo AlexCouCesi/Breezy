@@ -9,13 +9,16 @@ import {
     banUser,
     followUser,
     unfollowUser,
+    getFollowing
 } from '../controllers/users.controller.js';
 
 import {
     requireFields,
     requireRole,
-    isSelfOrAdmin
+    isSelfOrAdmin,
 } from '../middlewares/users.middleware.js';
+
+import { protect } from '../middlewares/users.middleware.js';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/profile-pictures/' });
@@ -38,10 +41,13 @@ router.delete('/:id', isSelfOrAdmin, deleteUser);
 // Bannir un utilisateur (réservé aux admins et modérateurs)
 router.post('/:id/ban', requireRole('admin', 'moderator'), banUser);
 
-// Suivre un utilisateur (rôle requis : user ou plus)
-router.post('/:id/follow', requireRole('user', 'moderator', 'admin'), followUser);
+// S'abonner à un utilisateur (protégé par authentification + rôle)
+router.post('/:id/follow', protect, requireRole('user', 'moderator', 'admin'), followUser);
 
-// Ne plus suivre un utilisateur (mêmes rôles requis)
-router.post('/:id/unfollow', requireRole('user', 'moderator', 'admin'), unfollowUser);
+// Se désabonner d'un utilisateur (DELETE plus propre que POST)
+router.delete('/:id/follow', protect, requireRole('user', 'moderator', 'admin'), unfollowUser);
+
+// Récupérer la liste des comptes suivis par un utilisateur
+router.get('/:id/following', protect, getFollowing);
 
 export default router;

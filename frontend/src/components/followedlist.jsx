@@ -1,20 +1,38 @@
-'use client';
-
-// Liste des comptes que l'utilisateur suit (version statique pour l’instant)
-export default function FollowedList() {
+export default function FollowedList({ following, onFilter, onUnfollow }) {
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-4">Comptes suivis</h2>
-            <ul className="space-y-4">
-                {[1, 2, 3].map((_, index) => (
-                    <li key={index} className="flex items-center gap-3">
-                        {/* Avatar (placeholder) */}
-                        <div className="w-10 h-10 bg-gray-300 rounded-full" />
-                        {/* Nom d’utilisateur en dur */}
-                        <span className="text-gray-800">@nickname</span>
-                    </li>
-                ))}
-            </ul>
+            <h3 className="font-bold text-lg mb-4">Comptes suivis</h3>
+            {following.length === 0 ? (
+                <p className="text-gray-500 text-sm">Vous ne suivez encore personne.</p>
+            ) : (
+                <ul className="space-y-2">
+                    {following.map(user => (
+                        <li key={user._id} className="flex justify-between items-center">
+                            <span
+                                className="cursor-pointer text-teal-600 hover:underline"
+                                onClick={() => onFilter(user._id)}
+                            >
+                                @{user.username}
+                            </span>
+                            <button
+                                onClick={() => onUnfollow(user._id)}
+                                className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                                ✕
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {following.length > 0 && (
+                <button
+                    onClick={() => onFilter(null)}
+                    className="mt-4 text-sm text-gray-500 hover:underline"
+                >
+                    Voir tous les posts
+                </button>
+            )}
         </div>
     );
 }
