@@ -10,6 +10,7 @@ export default function FeedPage() {
     const [posts, setPosts] = useState([]);
     const [newContent, setNewContent] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
+    const [lengthError, setLengthError] = useState('');
     const router = useRouter();
 
     useEffect(() => {
@@ -79,6 +80,11 @@ export default function FeedPage() {
 
     const handlePublish = async () => {
         if (!newContent.trim() && !selectedImage) return;
+        if (newContent.length > 250) {
+            setLengthError('Le post ne peut pas dépasser 250 caractères.');
+            return;
+        }
+
         try {
             let postData;
             let headers = { withCredentials: true };
@@ -106,6 +112,7 @@ export default function FeedPage() {
             setPosts([{ ...newPost, authorData }, ...posts]);
             setNewContent('');
             setSelectedImage(null);
+            setLengthError('');
         } catch (err) {
             console.error('Erreur publication', err);
         }
@@ -230,8 +237,22 @@ export default function FeedPage() {
                                 className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
                                 rows={3}
                                 value={newContent}
-                                onChange={e => setNewContent(e.target.value)}
+                                onChange={e => {
+                                    const value = e.target.value;
+                                    if (value.length > 250) {
+                                        setLengthError('Le post ne peut pas dépasser 250 caractères.');
+                                    } else {
+                                        setLengthError('');
+                                    }
+                                    setNewContent(value);
+                                }}
                             />
+                            <div className="flex justify-between items-center w-full mt-1 text-sm">
+                                <span className={`text-sm ${newContent.length > 250 ? 'text-red-500' : 'text-slate-500'}`}>
+                                    {newContent.length}/250 caractères
+                                </span>
+                                {lengthError && <span className="text-red-500">{lengthError}</span>}
+                            </div>
                         </div>
                     </div>
                     <div className="flex justify-end mt-2 gap-2">
@@ -248,7 +269,15 @@ export default function FeedPage() {
                             {selectedImage ? "Changer d'image" : "Choisir une image"}
                             <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                         </label>
-                        <button onClick={handlePublish} className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded">
+                        <button
+                            onClick={handlePublish}
+                            className={`px-6 py-2 rounded text-white transition-colors duration-200 ${
+                                newContent.length > 250 || (!newContent.trim() && !selectedImage)
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-emerald-500 hover:bg-emerald-600'
+                            }`}
+                            disabled={newContent.length > 250 || (!newContent.trim() && !selectedImage)}
+                        >
                             Publier
                         </button>
                     </div>
