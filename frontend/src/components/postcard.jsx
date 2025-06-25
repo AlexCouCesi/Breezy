@@ -3,12 +3,13 @@ import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
 import ReplyPopup from './reply-popup';
+import useuser from '@/utils/useuser';
 
 export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
-
+    const currentUser = useuser();
     const getUserId = () => {
         const token = Cookies.get('accessToken');
         if (!token) return null;
@@ -139,7 +140,7 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                     <button
                         variant="ghost"
                         size="sm"
-                        onClick={toggleComments}
+                        onClick={() => setShowComments(false)}
                         className="mt-4 text-teal-600 hover:text-teal-700 hover:bg-teal-50 transition-colors duration-200 "
                     >
                         Fermer
