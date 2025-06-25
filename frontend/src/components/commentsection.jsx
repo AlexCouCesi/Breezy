@@ -46,7 +46,6 @@ export default function CommentSection({ comments, onAddComment, onReply, onDele
                                 />
                                 <div className="text-sm text-slate-700">
                                     <p className="font-semibold">{comment.authorData?.username}</p>
-                                    <p className="text-xs text-slate-500">{comment.author}</p>
                                 </div>
                             </div>
                             {userId === comment.author && (
@@ -77,7 +76,6 @@ export default function CommentSection({ comments, onAddComment, onReply, onDele
                                         />
                                         <div className="text-sm text-slate-700">
                                             <p className="font-semibold">{reply.authorData?.username}</p>
-                                            <p className="text-xs text-slate-500">{reply.author}</p>
                                         </div>
                                     </div>
                                     {userId === reply.author && (

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
-//import ReplyPopup from './reply-popup';
 import ReplyButton from './replybutton';
 
 export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
@@ -106,16 +105,6 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                     onReply={(replyText) => onComment(replyText)}
                 />
 
-
-                {currentUser && post.author === currentUser._id && (
-                    <button
-                        onClick={onDelete}
-                        title="Supprimer"
-                        className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50"
-                    >
-                        Supprimer
-                    </button>
-                )}
                 <button
                     onClick={handleLikeClick}
                     title="Aimer"
