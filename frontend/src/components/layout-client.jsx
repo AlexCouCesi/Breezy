@@ -72,10 +72,18 @@ export default function LayoutClient({ children }) {
     }, [currentUser]);
 
     // Sinon, affiche le layout avec le SideMenu
+    // Pour passer des props à Feed, il faut que `children` soit un composant Feed
+    // et qu'on le clone avec React.cloneElement pour injecter des props
+    // Exemple : on veut passer `currentUser` à Feed si c'est bien Feed
+
     return (
         <div className="flex">
             <SideMenu />
-            <main className="flex-1 p-4">{children}</main>
+            <main className="flex-1 p-4">
+                {children && children.type?.name === 'Feed'
+                    ? React.cloneElement(children, { currentUser })
+                    : children}
+            </main>
             <FollowedList followingList={followingUsers} />
         </div>
     );

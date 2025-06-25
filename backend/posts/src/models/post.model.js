@@ -7,6 +7,7 @@ const postSchema = new mongoose.Schema({
         required: true,
         trim: true // Supprime les espaces en début/fin
     },
+    image: String, // URL de l'image (optionnelle)
     author: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

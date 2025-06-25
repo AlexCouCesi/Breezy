@@ -8,5 +8,6 @@ frontend/node_modules
 # Ignorer les fichiers de build Next.js (frontend)
 frontend/.next
 
-# Ignorer les photos de profil
+# Ignorer les fichiers dans les containers Docker
+backend/posts/uploads/posts-images
 backend/users/uploads/profile-pictures

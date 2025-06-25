@@ -65,6 +65,23 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                 )}
             </div>
 
+            {post.image && (
+                <div className="mb-4">
+                    <img
+                        src={`${process.env.NEXT_PUBLIC_API_URL}/${post.image}`}
+                        alt="Post"
+                        className="w-full h-auto rounded-lg shadow-sm object-cover"
+                        onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling.style.display = 'block';
+                        }}
+                    />
+                    <div className="hidden w-full h-auto text-center text-sm font-semibold text-teal-700 mt-2">
+                        Image indisponible
+                    </div>
+                </div>
+            )}
+
             <p className="text-slate-700 leading-relaxed mb-4 italic whitespace-pre-wrap">{post.content}</p>
 
             <div className="flex items-center gap-6">

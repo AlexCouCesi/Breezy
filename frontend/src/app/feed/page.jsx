@@ -6,7 +6,7 @@ import axios from '@/utils/axios';
 import Cookies from 'js-cookie';
 import PostCard from '@/components/postcard';
 
-export default function FeedPage() {
+export default function FeedPage(currentUser) {
     const [posts, setPosts] = useState([]);
     const [newContent, setNewContent] = useState('');
     const router = useRouter();
@@ -264,9 +264,17 @@ export default function FeedPage() {
                 {/* Zone de publication */}
                 <div className="bg-white border rounded-xl shadow p-4">
                     <div className="flex gap-4">
-                        {/* Avatar (statique pour l'instant) */}
+                        {/* Avatar */}
                         
-                        <div className="w-12 h-12 bg-gray-300 rounded-full flex-shrink-0" />
+                        <img
+                            src={
+                            currentUser.profilePicture
+                                ? `${process.env.NEXT_PUBLIC_API_URL}/${currentUser.profilePicture}`
+                                : `${process.env.NEXT_PUBLIC_API_URL}/assets/icones_divers/profile_icon.png`
+                            }
+                            alt={currentUser.username}
+                            className="w-10 h-10 rounded-full object-cover bg-gray-300"
+                        />
                         <textarea
                             placeholder="Comment ça va ?"
                             className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"

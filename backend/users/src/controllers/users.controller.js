@@ -52,7 +52,7 @@ export const updateUser = async (req, res) => {
 
         // Si une nouvelle photo a été uploadée, ajoute son chemin/URL
         if (req.file) {
-            updateData.profilePicture = req.file.path; // ou adapte selon ton besoin (URL publique, etc.)
+            updateData.profilePicture = req.file.path;
         }
 
         const updatedUser = await User.findByIdAndUpdate(

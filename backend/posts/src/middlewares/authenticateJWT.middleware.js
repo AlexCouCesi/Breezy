@@ -2,7 +2,13 @@ import jwt from 'jsonwebtoken';
 
 // Middleware pour valider un access token JWT présent dans les cookies
 export default function authenticateJWT(req, res, next) {
-    const token = req.cookies?.accessToken;
+    let token;
+    const authHeader = req.headers["authorization"];
+    if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+    } else if (req.cookies?.accessToken) {
+        token = req.cookies.accessToken;
+    }
 
     // Vérifie la présence du token dans les cookies
     if (!token) {
