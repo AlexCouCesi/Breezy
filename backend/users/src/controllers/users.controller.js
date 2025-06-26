@@ -124,11 +124,11 @@ export const unfollowUser = async (req, res) => {
         const followedId = req.params.id;
 
         if (!followerId || !followedId) {
-            return res.status(400).json({ error: 'ID manquant dans la requête.' });
+            return res.status(400).json({ error: 'ID manquant.' });
         }
 
         if (followerId === followedId) {
-            return res.status(400).json({ error: "Vous ne pouvez pas vous désabonner de vous-même." });
+            return res.status(400).json({ error: "Impossible de se désabonner de soi-même." });
         }
 
         const follower = await User.findById(followerId);
@@ -142,6 +142,7 @@ export const unfollowUser = async (req, res) => {
             return res.status(400).json({ error: "Vous ne suivez pas cet utilisateur." });
         }
 
+        // Ne pas utiliser ObjectId ici, Mongoose gère déjà les types
         followed.followers.pull(followerId);
         follower.following.pull(followedId);
 
@@ -154,4 +155,3 @@ export const unfollowUser = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-

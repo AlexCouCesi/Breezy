@@ -1,11 +1,11 @@
 'use client';
+import React from 'react';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from '@/utils/axios';
 import PostCard from '@/components/postcard';
-import Image from 'next/image';
 
 export default function Profile() {
     const router = useRouter();

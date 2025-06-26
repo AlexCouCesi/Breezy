@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import axios from '@/utils/axios';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import Image from 'next/image';
 
 export default function ProfileModification() {
     const router = useRouter();

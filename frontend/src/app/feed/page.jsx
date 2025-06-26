@@ -1,11 +1,12 @@
 'use client';
 
-import FollowedList from '@/components/followedlist';
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from '@/utils/axios';
 import PostCard from '@/components/postcard';
+import FollowedList from '@/components/followedlist';
 
 export default function FeedPage() {
     const [posts, setPosts] = useState([]);
@@ -15,35 +16,6 @@ export default function FeedPage() {
     const router = useRouter();
     const [following, setFollowing] = useState([]);
     const [followingUsersData, setFollowingUsersData] = useState([]);
-
-    useEffect(() => {
-        const fetchFollowingUsers = async () => {
-            try {
-                const responses = await Promise.all(following.map(id =>
-                    axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${id}`, { withCredentials: true })
-                ));
-                setFollowingUsersData(responses.map(r => r.data));
-            } catch (err) {
-                console.error("Erreur loading user data", err);
-            }
-        };
-        if (following.length > 0) {
-            fetchFollowingUsers();
-        }
-    }, [following]);
-
-
-    useEffect(() => {
-        const fetchFollowing = async () => {
-            try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/me`, { withCredentials: true });
-                setFollowing(res.data.following || []);
-            } catch (err) {
-                console.error("Erreur récupération following", err);
-            }
-        };
-        fetchFollowing();
-    }, []);
 
     useEffect(() => {
         const token = Cookies.get('accessToken');
@@ -75,6 +47,40 @@ export default function FeedPage() {
         };
         fetchPosts();
     }, []);
+
+    useEffect(() => {
+    const fetchFollowing = async () => {
+        try {
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/me`, { withCredentials: true });
+        const user = res.data;
+        setFollowing(user.following || []);
+        } catch (err) {
+        console.error("Erreur récupération following", err);
+        }
+    };
+
+    fetchFollowing();
+    }, []);
+
+    useEffect(() => {
+    const fetchFollowingUsers = async () => {
+        try {
+        const responses = await Promise.all(
+            following.map(id => axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${id}`, { withCredentials: true }))
+        );
+        setFollowingUsersData(responses.map(r => r.data));
+        } catch (err) {
+        console.error("Erreur données utilisateurs suivis", err);
+        }
+    };
+
+    if (following.length > 0) {
+        fetchFollowingUsers();
+    } else {
+        setFollowingUsersData([]);
+    }
+    }, [following]);
+
 
     const enrichCommentsWithUser = async (comments) => {
         return Promise.all(comments.map(async (comment) => {
@@ -351,6 +357,7 @@ export default function FeedPage() {
                     ))}
                 </div>
             </div>
+            <FollowedList followingList={followingUsersData} onUnfollow={handleUnfollow} />
         </div>
     );
 }

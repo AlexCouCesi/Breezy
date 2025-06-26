@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import LayoutClient from "@/components/layout-client"; // Composant client global
+import React from 'react';
 
 // Chargement des polices Geist (sans & mono)
 const geistSans = Geist({

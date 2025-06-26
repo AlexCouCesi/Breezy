@@ -1,4 +1,5 @@
 // Composant Footer global
+import React from 'react';
 export default function Footer() {
   return (
     <footer className="bg-white border-t mt-12 py-6">
