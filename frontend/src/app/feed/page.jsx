@@ -5,18 +5,61 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from '@/utils/axios';
 import PostCard from '@/components/postcard';
+import FollowedList from '@/components/followedlist';
 
 export default function FeedPage() {
     const [posts, setPosts] = useState([]);
     const [newContent, setNewContent] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
     const [lengthError, setLengthError] = useState('');
+    const [followingList, setFollowingList] = useState([]);
+    const [showFollowedOnly, setShowFollowedOnly] = useState(false);
     const router = useRouter();
+
+    const getUserId = () => {
+        const token = Cookies.get('accessToken');
+        if (!token) return null;
+        try {
+            return JSON.parse(atob(token.split('.')[1])).id;
+        } catch {
+            return null;
+        }
+    };
 
     useEffect(() => {
         const token = Cookies.get('accessToken');
         if (!token) router.replace('/auth/login');
     }, [router]);
+
+    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            const userId = getUserId();
+            if (!userId) return;
+            
+            try {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${userId}`, { withCredentials: true });
+                const userData = res.data;
+                
+                if (userData.following && userData.following.length > 0) {
+                    const followingData = await Promise.all(
+                        userData.following.map(async (followedId) => {
+                            try {
+                                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${followedId}`, { withCredentials: true });
+                                return userRes.data;
+                            } catch {
+                                return null;
+                            }
+                        })
+                    );
+                    setFollowingList(followingData.filter(user => user !== null));
+                }
+            } catch (err) {
+                console.error('Erreur récupération utilisateur courant', err);
+            }
+        };
+        
+        fetchCurrentUser();
+    }, []);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -211,10 +254,53 @@ export default function FeedPage() {
         }
     };
 
+    const handleFollow = async (targetUserId) => {
+        const currentUserId = getUserId();
+        if (!currentUserId) return;
+
+        try {
+            const isCurrentlyFollowing = followingList.some(user => user._id === targetUserId);
+            
+            if (isCurrentlyFollowing) {
+                await axios.delete(`${process.env.NEXT_PUBLIC_USERS_URL}/${currentUserId}/unfollow/${targetUserId}`, { withCredentials: true });
+                setFollowingList(prev => prev.filter(user => user._id !== targetUserId));
+            } else {
+                await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${currentUserId}/follow/${targetUserId}`, {}, { withCredentials: true });
+                try {
+                    const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${targetUserId}`, { withCredentials: true });
+                    setFollowingList(prev => [...prev, userRes.data]);
+                } catch {}
+            }
+        } catch (err) {
+            console.error('Erreur follow/unfollow', err);
+        }
+    };
+
+    const filteredPosts = showFollowedOnly 
+        ? posts.filter(post => followingList.some(user => user._id === post.author))
+        : posts;
+
     return (
-        <div className="container mx-auto h-[calc(100vh-3rem)] flex flex-col">
-            <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
-                <h1 className="text-3xl font-bold text-slate-800 mb-6">Page d'accueil</h1>
+        <div className="flex min-h-screen">
+            <div className="flex-1 container mx-auto h-[calc(100vh-3rem)] flex flex-col">
+                <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-3xl font-bold text-slate-800">Page d'accueil</h1>
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={showFollowedOnly}
+                                    onChange={(e) => setShowFollowedOnly(e.target.checked)}
+                                    className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                                />
+                                <span className="text-slate-700">Comptes suivis uniquement</span>
+                            </label>
+                            <span className="text-sm text-slate-500">
+                                ({followingList.length} compte{followingList.length !== 1 ? 's' : ''} suivi{followingList.length !== 1 ? 's' : ''})
+                            </span>
+                        </div>
+                    </div>
 
                 {/* Zone de publication */}
                 <div className="bg-white border rounded-xl shadow p-4 mb-6">
@@ -283,19 +369,34 @@ export default function FeedPage() {
                 </div>
 
                 {/* Liste des posts */}
-                {posts.map(post => (
-                    <PostCard
-                        key={post._id}
-                        post={post}
-                        onLike={() => handleLike(post._id)}
-                        onComment={(text) => handleAddComment(post._id, text)}
-                        onReply={(commentId, text) => handleReply(post._id, commentId, text)}
-                        onDelete={() => handleDelete(post._id)}
-                        onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
-                        onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
-                    />
-                ))}
+                {filteredPosts.length > 0 ? (
+                    filteredPosts.map(post => (
+                        <PostCard
+                            key={post._id}
+                            post={post}
+                            onLike={() => handleLike(post._id)}
+                            onComment={(text) => handleAddComment(post._id, text)}
+                            onReply={(commentId, text) => handleReply(post._id, commentId, text)}
+                            onDelete={() => handleDelete(post._id)}
+                            onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
+                            onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
+                            onFollow={handleFollow}
+                            isFollowing={followingList.some(user => user._id === post.author)}
+                        />
+                    ))
+                ) : (
+                    <div className="text-center py-12">
+                        <p className="text-slate-500 text-lg">
+                            {showFollowedOnly 
+                                ? 'Aucun post des comptes suivis. Suivez des utilisateurs pour voir leurs posts ici.'
+                                : 'Aucun post à afficher.'
+                            }
+                        </p>
+                    </div>
+                )}
+                </div>
             </div>
+            <FollowedList followingList={followingList} />
         </div>
     );
 }

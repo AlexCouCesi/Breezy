@@ -3,8 +3,9 @@ import Cookies from 'js-cookie';
 import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
 import ReplyButton from './replybutton';
+import FollowButton from './followbutton';
 
-export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
+export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply, onFollow, isFollowing }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -56,6 +57,12 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                         <span className="text-slate-500">{new Date(post.createdAt).toLocaleString()}</span>
                     </div>
                 </div>
+                {userId !== post.author && onFollow && (
+                    <FollowButton
+                        isFollowing={isFollowing}
+                        onToggle={() => onFollow(post.author)}
+                    />
+                )}
                 {userId === post.author && (
                     <button
                         onClick={onDelete}

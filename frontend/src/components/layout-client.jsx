@@ -33,21 +33,17 @@ export default function LayoutClient({ children }) {
         const fetchUser = async () => {
             try {
                 const res = await axios.get('/api/users/me', { withCredentials: true });
-                // Si l'utilisateur n'est pas trouvé, redirige vers la page de connexion
                 if (!res.data) {
-                    // router.replace('/auth/login');th/login');
-              
-                 } else {
-                    return setUser(res.data);
+                    router.replace('/auth/login');
                 }
             } catch (err) {
                 console.error('Erreur récupération utilisateur', err);
-                // router.replace('/auth/login');
+                router.replace('/auth/login');
             }
         };
 
         fetchUser();
-    }, []);
+    }, [router]);
 
     useEffect(() => {
         const fetchFollowingUsers = async () => {
@@ -80,9 +76,7 @@ export default function LayoutClient({ children }) {
         <div className="flex">
             <SideMenu />
             <main className="flex-1 p-4">
-                {children && children.type?.name === 'Feed'
-                    ? React.cloneElement(children, { currentUser })
-                    : children}
+                {children}
             </main>
             <FollowedList followingList={followingUsers} />
         </div>
