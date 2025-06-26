@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 // Composant de carte simple pour structurer le contenu
 export function Card({ children }) {

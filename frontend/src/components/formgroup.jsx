@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 // Composant FormGroup : regroupe un label, un champ et un message d’erreur
 export function FormGroup({ label, children, error = "" }) {

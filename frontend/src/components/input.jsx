@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 // Champ de saisie réutilisable avec styles par défaut
 export function Input({ type = "text", ...props }) {

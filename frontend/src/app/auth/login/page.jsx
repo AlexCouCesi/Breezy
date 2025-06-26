@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/utils/api';
 import Cookies from 'js-cookie';

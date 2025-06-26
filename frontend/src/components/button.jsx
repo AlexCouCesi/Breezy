@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 // Bouton réutilisable avec variantes de style
 export default function Button({
