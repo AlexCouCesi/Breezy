@@ -4,9 +4,9 @@ import {
     createUser,
     getAllUsers,
     getUserById,
+    getConnectedUser,
     updateUser,
     deleteUser,
-    banUser,
     followUser,
     unfollowUser,
     getFollowing
@@ -28,6 +28,10 @@ router.post('/', requireFields(['username', 'email', '_id']), createUser);
 
 // Récupérer tous les utilisateurs
 router.get('/', getAllUsers);
+
+// Récupérer l'utilisateur connecté (via le token JWT)
+// Placé avant /:id pour ne pas avoir de conflit
+router.get('/me', requireRole('user', 'moderator', 'admin'), getConnectedUser);
 
 // Récupérer un utilisateur par son ID
 router.get('/:id', getUserById);

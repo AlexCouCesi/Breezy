@@ -33,6 +33,18 @@ export const getUserById = async (req, res) => {
     }
 };
 
+// Récupère l'utilisateur connecté (via le token JWT)
+export const getConnectedUser = async (req, res) => {
+    try {
+        const userId = req.user._id; // L'ID de l'utilisateur est extrait du token JWT
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' + userId });
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
 // Met à jour un utilisateur
 export const updateUser = async (req, res) => {
     try {
@@ -40,7 +52,7 @@ export const updateUser = async (req, res) => {
 
         // Si une nouvelle photo a été uploadée, ajoute son chemin/URL
         if (req.file) {
-            updateData.profilePicture = req.file.path; // ou adapte selon ton besoin (URL publique, etc.)
+            updateData.profilePicture = req.file.path;
         }
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -67,14 +79,9 @@ export const deleteUser = async (req, res) => {
     }
 };
 
-// TODO : bannir un utilisateur
-export const banUser = async (req, res) => {
-    res.status(200).json({ message: `Utilisateur ${req.params.id} banni` });
-};
-
 // Suivre un autre utilisateur
 export const followUser = async (req, res) => {
-    const followerId = req.user.id;       // L'utilisateur connecté
+    const followerId = req.user._id;       // L'utilisateur connecté
     const followedId = req.params.id;     // L'utilisateur à suivre
 
     if (!followerId) {
