@@ -246,7 +246,6 @@ export default function Profile() {
                     <div className="flex-1">
                         <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
                             <h2 className="text-xl font-semibold text-slate-800 mb-1">{user?.username}</h2>
-                            <p className="text-teal-600 mb-4">@{user?.username}</p>
                             <p className="text-slate-600 leading-relaxed">{user?.biography || "Biographie courte"}</p>
                         </div>
                     </div>
