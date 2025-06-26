@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from '@/utils/axios';
 import PostCard from '@/components/postcard';
-import FollowedList from '@/components/followedlist';
 
 export default function FeedPage() {
     const [posts, setPosts] = useState([]);
@@ -396,7 +395,6 @@ export default function FeedPage() {
                 )}
                 </div>
             </div>
-            <FollowedList followingList={followingList} />
         </div>
     );
 }

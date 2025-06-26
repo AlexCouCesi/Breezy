@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Base de données MongoDB
   mongo:
-    image: mongo
+    image: mongo:7-jammy
     container_name: breezy-mongo
     restart: always
     ports:
@@ -73,7 +73,7 @@ services:
 
   # Gateway NGINX (reverse proxy unifié vers auth, users, posts, frontend)
   nginx:
-    image: nginx:latest
+    image: nginx:alpine
     container_name: breezy-gateway
     ports:
       - "8080:8080" # exposé à l’extérieur

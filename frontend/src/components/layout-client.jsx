@@ -29,6 +29,10 @@ export default function LayoutClient({ children }) {
     const [followingUsers, setFollowingUsers] = useState([]);
     const router = useRouter();
 
+    const handleUnfollow = (targetUserId) => {
+        setFollowingUsers(prev => prev.filter(user => user._id !== targetUserId));
+    };
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -78,7 +82,7 @@ export default function LayoutClient({ children }) {
             <main className="flex-1 p-4">
                 {children}
             </main>
-            <FollowedList followingList={followingUsers} />
+            <FollowedList followingList={followingUsers} onUnfollow={handleUnfollow} />
         </div>
     );
 }
