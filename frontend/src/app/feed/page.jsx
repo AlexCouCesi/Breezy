@@ -261,10 +261,10 @@ export default function FeedPage() {
             const isCurrentlyFollowing = followingList.some(user => user._id === targetUserId);
             
             if (isCurrentlyFollowing) {
-                await axios.delete(`${process.env.NEXT_PUBLIC_USERS_URL}/${currentUserId}/unfollow/${targetUserId}`, { withCredentials: true });
+                await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${targetUserId}/unfollow`, {}, { withCredentials: true });
                 setFollowingList(prev => prev.filter(user => user._id !== targetUserId));
             } else {
-                await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${currentUserId}/follow/${targetUserId}`, {}, { withCredentials: true });
+                await await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${targetUserId}/follow`, {}, { withCredentials: true });
                 try {
                     const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${targetUserId}`, { withCredentials: true });
                     setFollowingList(prev => [...prev, userRes.data]);
