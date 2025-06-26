@@ -81,64 +81,77 @@ export const deleteUser = async (req, res) => {
 
 // Suivre un autre utilisateur
 export const followUser = async (req, res) => {
-    const followerId = req.user._id;       // L'utilisateur connecté
-    const followedId = req.params.id;     // L'utilisateur à suivre
-
-    if (!followerId) {
-        return res.status(400).json({ error: 'User ID is required' });
-    }
-
     try {
+        const followerId = req.user?._id;
+        const followedId = req.params.id;
+
+        if (!followerId || !followedId) {
+            return res.status(400).json({ error: 'ID manquant dans la requête.' });
+        }
+
+        if (followerId === followedId) {
+            return res.status(400).json({ error: "Vous ne pouvez pas vous suivre vous-même." });
+        }
+
         const follower = await User.findById(followerId);
         const followed = await User.findById(followedId);
+
         if (!follower || !followed) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "Utilisateur non trouvé." });
         }
 
         if (followed.followers.includes(followerId)) {
-            return res.status(400).json({ error: 'You are already following this user' });
+            return res.status(400).json({ error: "Déjà abonné à cet utilisateur." });
         }
 
         followed.followers.push(followerId);
         follower.following.push(followedId);
 
-        await follower.save();
         await followed.save();
+        await follower.save();
 
-        res.status(200).json({ message: `User ${followerId} followed user ${followedId}` });
+        res.status(200).json({ message: `Suivi de ${followed.username} réussi.` });
     } catch (err) {
+        console.error("Erreur dans followUser :", err);
         res.status(500).json({ error: err.message });
     }
 };
 
 // Se désabonner d’un utilisateur
 export const unfollowUser = async (req, res) => {
-    const followerId = req.user.id;       // L'utilisateur connecté
-    const followedId = req.params.id;     // L'utilisateur à désuivre
-
-    if (!followerId) {
-        return res.status(400).json({ error: 'User ID is required' });
-    }
-
     try {
+        const followerId = req.user?._id;
+        const followedId = req.params.id;
+
+        if (!followerId || !followedId) {
+            return res.status(400).json({ error: 'ID manquant dans la requête.' });
+        }
+
+        if (followerId === followedId) {
+            return res.status(400).json({ error: "Vous ne pouvez pas vous désabonner de vous-même." });
+        }
+
         const follower = await User.findById(followerId);
         const followed = await User.findById(followedId);
+
         if (!follower || !followed) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: "Utilisateur non trouvé." });
         }
 
         if (!followed.followers.includes(followerId)) {
-            return res.status(400).json({ error: 'You are not following this user' });
+            return res.status(400).json({ error: "Vous ne suivez pas cet utilisateur." });
         }
 
         followed.followers.pull(followerId);
         follower.following.pull(followedId);
 
-        await follower.save();
         await followed.save();
+        await follower.save();
 
-        res.status(200).json({ message: `User ${followerId} unfollowed user ${followedId}` });
+        res.status(200).json({ message: `Désabonnement de ${followed.username} effectué.` });
     } catch (err) {
+        console.error("Erreur dans unfollowUser :", err);
         res.status(500).json({ error: err.message });
     }
 };
+

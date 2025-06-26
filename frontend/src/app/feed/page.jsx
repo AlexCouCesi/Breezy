@@ -1,5 +1,6 @@
 'use client';
 
+import FollowedList from '@/components/followedlist';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
@@ -12,6 +13,37 @@ export default function FeedPage() {
     const [selectedImage, setSelectedImage] = useState(null);
     const [lengthError, setLengthError] = useState('');
     const router = useRouter();
+    const [following, setFollowing] = useState([]);
+    const [followingUsersData, setFollowingUsersData] = useState([]);
+
+    useEffect(() => {
+        const fetchFollowingUsers = async () => {
+            try {
+                const responses = await Promise.all(following.map(id =>
+                    axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${id}`, { withCredentials: true })
+                ));
+                setFollowingUsersData(responses.map(r => r.data));
+            } catch (err) {
+                console.error("Erreur loading user data", err);
+            }
+        };
+        if (following.length > 0) {
+            fetchFollowingUsers();
+        }
+    }, [following]);
+
+
+    useEffect(() => {
+        const fetchFollowing = async () => {
+            try {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/me`, { withCredentials: true });
+                setFollowing(res.data.following || []);
+            } catch (err) {
+                console.error("Erreur récupération following", err);
+            }
+        };
+        fetchFollowing();
+    }, []);
 
     useEffect(() => {
         const token = Cookies.get('accessToken');
@@ -211,90 +243,113 @@ export default function FeedPage() {
         }
     };
 
-    return (
-        <div className="container mx-auto h-[calc(100vh-3rem)] flex flex-col">
-            <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
-                <h1 className="text-3xl font-bold text-slate-800 mb-6">Page d'accueil</h1>
+    const handleFollow = async (userId) => {
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${userId}/follow`, {}, { withCredentials: true });
+            setFollowing(prev => [...prev, userId]);
+        } catch (err) {
+            console.error("Erreur suivi", err);
+        }
+    };
 
-                {/* Zone de publication */}
-                <div className="bg-white border rounded-xl shadow p-4 mb-6">
-                    <div className="flex gap-4">
-                        <img
-                            src="/assets/icones_divers/profile_icon.png"
-                            alt="Moi"
-                            className="w-10 h-10 rounded-full object-cover bg-gray-300"
-                        />
-                        <div className="flex flex-col items-center w-full">
-                            {selectedImage && (
-                                <img
-                                    src={URL.createObjectURL(selectedImage)}
-                                    alt="Aperçu"
-                                    className="w-full max-h-96 object-contain border rounded-lg mb-2"
-                                />
-                            )}
-                            <textarea
-                                placeholder="Comment ça va ?"
-                                className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
-                                rows={3}
-                                value={newContent}
-                                onChange={e => {
-                                    const value = e.target.value;
-                                    if (value.length > 250) {
-                                        setLengthError('Le post ne peut pas dépasser 250 caractères.');
-                                    } else {
-                                        setLengthError('');
-                                    }
-                                    setNewContent(value);
-                                }}
+    const handleUnfollow = async (userId) => {
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${userId}/unfollow`, {}, { withCredentials: true });
+            setFollowing(prev => prev.filter(id => id !== userId));
+        } catch (err) {
+            console.error("Erreur désabonnement", err);
+        }
+    };
+
+    return (
+        <div className="container mx-auto h-[calc(100vh-3rem)] flex">
+            {/* Colonne principale : flux de posts */}
+            <div className="flex-1 h-full flex flex-col">
+                <div className="space-y-4 flex-1 overflow-y-auto min-h-0 p-4">
+                    <h1 className="text-3xl font-bold text-slate-800 mb-6">Page d'accueil</h1>
+
+                    {/* Zone de publication */}
+                    <div className="bg-white border rounded-xl shadow p-4 mb-6">
+                        <div className="flex gap-4">
+                            <img
+                                src="/assets/icones_divers/profile_icon.png"
+                                alt="Moi"
+                                className="w-10 h-10 rounded-full object-cover bg-gray-300"
                             />
-                            <div className="flex justify-between items-center w-full mt-1 text-sm">
-                                <span className={`text-sm ${newContent.length > 250 ? 'text-red-500' : 'text-slate-500'}`}>
-                                    {newContent.length}/250 caractères
-                                </span>
-                                {lengthError && <span className="text-red-500">{lengthError}</span>}
+                            <div className="flex flex-col items-center w-full">
+                                {selectedImage && (
+                                    <img
+                                        src={URL.createObjectURL(selectedImage)}
+                                        alt="Aperçu"
+                                        className="w-full max-h-96 object-contain border rounded-lg mb-2"
+                                    />
+                                )}
+                                <textarea
+                                    placeholder="Comment ça va ?"
+                                    className="w-full border rounded-md p-2 resize-none text-slate-900 placeholder-slate-500"
+                                    rows={3}
+                                    value={newContent}
+                                    onChange={e => {
+                                        const value = e.target.value;
+                                        if (value.length > 250) {
+                                            setLengthError('Le post ne peut pas dépasser 250 caractères.');
+                                        } else {
+                                            setLengthError('');
+                                        }
+                                        setNewContent(value);
+                                    }}
+                                />
+                                <div className="flex justify-between items-center w-full mt-1 text-sm">
+                                    <span className={`text-sm ${newContent.length > 250 ? 'text-red-500' : 'text-slate-500'}`}>
+                                        {newContent.length}/250 caractères
+                                    </span>
+                                    {lengthError && <span className="text-red-500">{lengthError}</span>}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="flex justify-end mt-2 gap-2">
-                        {selectedImage && (
+                        <div className="flex justify-end mt-2 gap-2">
+                            {selectedImage && (
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedImage(null)}
+                                    className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded"
+                                >
+                                    Supprimer
+                                </button>
+                            )}
+                            <label htmlFor="image-upload" className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded cursor-pointer">
+                                {selectedImage ? "Changer d'image" : "Choisir une image"}
+                                <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                            </label>
                             <button
-                                type="button"
-                                onClick={() => setSelectedImage(null)}
-                                className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded"
-                            >
-                                Supprimer
-                            </button>
-                        )}
-                        <label htmlFor="image-upload" className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded cursor-pointer">
-                            {selectedImage ? "Changer d'image" : "Choisir une image"}
-                            <input id="image-upload" type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-                        </label>
-                        <button
-                            onClick={handlePublish}
-                            className={`px-6 py-2 rounded text-white transition-colors duration-200 ${newContent.length > 250 || (!newContent.trim() && !selectedImage)
+                                onClick={handlePublish}
+                                className={`px-6 py-2 rounded text-white transition-colors duration-200 ${newContent.length > 250 || (!newContent.trim() && !selectedImage)
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-emerald-500 hover:bg-emerald-600'
-                                }`}
-                            disabled={newContent.length > 250 || (!newContent.trim() && !selectedImage)}
-                        >
-                            Publier
-                        </button>
+                                    }`}
+                                disabled={newContent.length > 250 || (!newContent.trim() && !selectedImage)}
+                            >
+                                Publier
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                {/* Liste des posts */}
-                {posts.map(post => (
-                    <PostCard
-                        key={post._id}
-                        post={post}
-                        onLike={() => handleLike(post._id)}
-                        onComment={(text) => handleAddComment(post._id, text)}
-                        onReply={(commentId, text) => handleReply(post._id, commentId, text)}
-                        onDelete={() => handleDelete(post._id)}
-                        onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
-                        onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
-                    />
-                ))}
+                    {/* Liste des posts */}
+                    {posts.map(post => (
+                        <PostCard
+                            key={post._id}
+                            post={post}
+                            onLike={() => handleLike(post._id)}
+                            onComment={(text) => handleAddComment(post._id, text)}
+                            onReply={(commentId, text) => handleReply(post._id, commentId, text)}
+                            onDelete={() => handleDelete(post._id)}
+                            onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
+                            onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
+                            isFollowing={following.includes(post.author)}
+                            onFollow={() => handleFollow(post.author)}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );

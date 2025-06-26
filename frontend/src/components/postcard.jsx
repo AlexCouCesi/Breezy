@@ -4,7 +4,7 @@ import CommentSection from './commentsection';
 import useUser from '@/utils/useuser';
 import ReplyButton from './replybutton';
 
-export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
+export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply, isFollowing, onFollow }) {
     const author = post.authorData;
     const [showComments, setShowComments] = useState(false);
     const [liked, setLiked] = useState(false);
@@ -63,6 +63,14 @@ export default function PostCard({ post, onLike, onComment, onReply, onDelete, o
                         className="text-slate-500 hover:text-red-600 transition-colors duration-200 p-2 rounded hover:bg-red-50 text-sm"
                     >
                         Supprimer
+                    </button>
+                )}
+                {userId !== post.author && !isFollowing && (
+                    <button
+                        onClick={onFollow}
+                        className="ml-auto text-sm px-3 py-1 bg-emerald-500 text-white rounded hover:bg-emerald-600"
+                    >
+                        Suivre
                     </button>
                 )}
             </div>
