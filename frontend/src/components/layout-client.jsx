@@ -6,7 +6,7 @@ import FollowedList from './followedlist';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from '@/utils/axios';
-
+import useUser from '@/utils/useuser';
 
 // Layout côté client : affiche ou masque le SideMenu selon la page
 export default function LayoutClient({ children }) {
@@ -25,7 +25,7 @@ export default function LayoutClient({ children }) {
 
     
     // Récupère les infos de l'utilisateur connecté
-    const [currentUser, setUser] = useState(null);
+    const currentUser = useUser();
     const [followingUsers, setFollowingUsers] = useState([]);
     const router = useRouter();
 
