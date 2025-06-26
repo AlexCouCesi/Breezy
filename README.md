@@ -12,22 +12,12 @@
 | Fx2  | Authentification sécurisée (JWT)                               | Utilisateur            |
 | Fx3  | Publication de messages courts (280 caractères)                | Utilisateur            |
 | Fx4  | Affichage des messages sur le profil                           | Utilisateur            |
-| Fx5  | Fil chronologique des messages des abonnements                 | Utilisateur            |
+| Fx5  | Fil chronologique des messages des utilisateurs suivis         | Utilisateur            |
 | Fx6  | Liker un post                                                  | Utilisateur            |
 | Fx7  | Commenter un post                                              | Utilisateur            |
 | Fx8  | Répondre à un commentaire                                      | Utilisateur            |
 | Fx9  | Suivre / être suivi                                            | Utilisateur            |
 | Fx10 | Profil utilisateur (photo, bio)                                | Utilisateur            |
-| Fx17 | Messagerie privée entre utilisateurs                           | Utilisateur            |
-
-**Fonctionnalités secondaires (optionnelles) :**  
-- Ajout de tags aux messages & recherche par tags (Fx12, Fx13)  
-- Notifications (mentions, likes, nouveaux followers) (Fx14, Fx16)  
-- Upload d’images et de vidéos (Fx18, Fx19)  
-- Signalement de contenu inapproprié (Fx20)  
-- Suspension / bannissement (Fx21)  
-- Interface multi-langues (Fx22)  
-- Thème personnalisé (Fx23)  
 
 ---
 
@@ -62,27 +52,42 @@
 
 ## Installation & démarrage
 
-1. Clonez le dépôt :  
+1. Clonez le dépôt :
+
    ```bash
    git clone https://github.com/votre-org/breezy.git
    cd breezy
 
-2. Démarrez les services Docker :
+2. Installer Node.js
+
+3. Installer et démarrer Docker Desktop
+
+4. Démarrez les services Docker :
+
    ```bash
    docker-compose up --build
 
-3. Front-end :
+5. Front-end :
+
    ```bash
    cd frontend
    npm install
    npm run dev
 
-4. Back-end :
+6. Back-end :
+
    ```bash
    cd backend
    npm install
    npm run dev
 
-5. Accès à l'application :
+7. Service d'authentification
 
-Accédez à l'application sur http://localhost:8080
+   ```bash
+   cd auth
+   npm install
+   npm run dev
+
+8. Accès à l'application :
+
+Accédez à l'application sur <http://localhost:8080>
