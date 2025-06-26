@@ -248,7 +248,10 @@ export default function Profile() {
                 </div>
 
                 <div className="mb-8">
-                    <button className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 shadow-sm">
+                    <button
+                        className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 shadow-sm"
+                        onClick={() => router.push('/profile-modification')}
+                    >
                         <img src="/assets/icones_comments/edit_icon.png" alt="Modifier" className="w-4 h-4 filter brightness-0 invert" />
                         Modifier le profil
                     </button>
