@@ -1,37 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import CommentSection from './commentsection';
-import useUser from '@/utils/useuser';
-import ReplyButton from './replybutton';
 import React from 'react';
-
-export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply }) {
-    const author = post.authorData;
-    const [showComments, setShowComments] = useState(false);
-    const [liked, setLiked] = useState(false);
-    const currentUser = useUser();
-    const getUserId = () => {
-        const token = Cookies.get('accessToken');
-        if (!token) return null;
-        try {
-            return JSON.parse(atob(token.split('.')[1])).id;
-        } catch {
-            return null;
-        }
-    };
-
-    const userId = getUserId();
-
-    const handleLikeClick = () => {
-        setLiked(!liked);
-        onLike();
-    };
-
-    useEffect(() => {
-        if (userId) {
-            setLiked(post.likes?.includes(userId));
-        }
-    }, [post.likes, userId]);
 
 export default function PostCard({ post, onLike, onComment, onReply, onDelete, onDeleteComment, onDeleteReply, onFollow, isFollowing }) {
     return (

@@ -40,7 +40,7 @@ services:
     networks:
       - breezy-net
     volumes:
-      - ./backend/users/uploads/profile-pictures:/app/uploads/profile-pictures
+      - ./backend/users/uploads:/app/uploads
 
   # Service des publications (posts, commentaires, likes)
   post:
@@ -55,8 +55,6 @@ services:
       - auth
     networks:
       - breezy-net
-    volumes:
-      - ./backend/posts/uploads/posts-images:/app/uploads/posts-images
 
   # Interface utilisateur (frontend React / Next.js)
   frontend:
@@ -79,8 +77,7 @@ services:
       - "8080:8080" # exposé à l’extérieur
     volumes:
       - ./backend/gateway/nginx.conf:/etc/nginx/nginx.conf
-      - ./backend/users/uploads/profile-pictures:/app/uploads/profile-pictures
-      - ./backend/posts/uploads/posts-images:/app/uploads/posts-images
+      - ./backend/users/uploads:/app/uploads
     depends_on:
       - auth
       - users

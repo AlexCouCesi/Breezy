@@ -4,12 +4,6 @@ import Post from '../models/post.model.js';
 export const createPost = async (req, res) => {
     const { content } = req.body;
     const author = req.user?.id; // Récupéré depuis le middleware JWT
-    const newPost = new Post({ content, author });
-
-    // Si une nouvelle photo a été uploadée, ajoute son chemin/URL
-    if (req.file) {
-        newPost.image = req.file.path;
-    }
 
     // Vérifie que le contenu est présent et respecte la limite
     if (!content || content.length > 250) {
@@ -19,6 +13,7 @@ export const createPost = async (req, res) => {
     }
 
     try {
+        const newPost = new Post({ content, author });
         await newPost.save();
         res.status(201).json({ message: 'Post publié avec succès', post: newPost });
     } catch (error) {

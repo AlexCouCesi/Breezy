@@ -1,5 +1,4 @@
 import express from 'express';
-import multer from 'multer';
 import {
     createPost,
     getAllPosts,
@@ -14,12 +13,10 @@ import {
 import authenticateJWT from '../middlewares/authenticateJWT.middleware.js';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/posts-images/' });
-
 
 // Route POST /api/posts/
 // Création d'un nouveau post (authentification requise via JWT dans les cookies)
-router.post('/', upload.single('image'), authenticateJWT, createPost);
+router.post('/', authenticateJWT, createPost);
 
 // Route GET /api/posts/
 // Récupération de tous les posts (accessible publiquement)

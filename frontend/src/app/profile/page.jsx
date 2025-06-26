@@ -1,11 +1,10 @@
 'use client';
-
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import axios from '@/utils/axios';
-import PostCard from '@/components/postcard';
 import Image from 'next/image';
+import PostCard from '@/components/postcard';
 
 export default function Profile() {
     const router = useRouter();
@@ -18,7 +17,6 @@ export default function Profile() {
             router.replace('/auth/login');
             return;
         }
-
         const userId = JSON.parse(atob(token.split('.')[1])).id;
 
         axios.get('/api/auth/me', { withCredentials: true })
@@ -27,61 +25,30 @@ export default function Profile() {
 
         const fetchPosts = async () => {
             try {
-                const res = await axios.get(`/api/posts/user/${userId}`, { withCredentials: true });
-                const rawPosts = res.data;
+                const postsRes = await axios.get(`/api/posts/user/${userId}`, { withCredentials: true });
+                const rawPosts = postsRes.data;
 
                 const postsWithAuthors = await Promise.all(
                     rawPosts.map(async post => {
-                        let authorData = null;
                         try {
-                            const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
+                            const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, {
                                 withCredentials: true,
                             });
-                            authorData = resAuthor.data;
-                        } catch {}
-
-                        const enrichedComments = await enrichCommentsWithUser(post.comments || []);
-                        return { ...post, authorData, comments: enrichedComments };
+                            return { ...post, authorData: userRes.data };
+                        } catch {
+                            return { ...post, authorData: null };
+                        }
                     })
                 );
 
                 setPosts(postsWithAuthors);
             } catch (err) {
-                console.error('Erreur récupération des posts', err);
+                console.error('Erreur posts profil', err);
             }
         };
 
         fetchPosts();
     }, [router]);
-
-    const enrichCommentsWithUser = async (comments) => {
-        return Promise.all(comments.map(async (comment) => {
-            let enrichedAuthor = null;
-            try {
-                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${comment.author}`, {
-                    withCredentials: true,
-                });
-                enrichedAuthor = res.data;
-            } catch {}
-
-            const enrichedReplies = await Promise.all((comment.replies || []).map(async (reply) => {
-                let replyAuthor = null;
-                try {
-                    const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${reply.author}`, {
-                        withCredentials: true,
-                    });
-                    replyAuthor = res.data;
-                } catch {}
-                return { ...reply, authorData: replyAuthor };
-            }));
-
-            return {
-                ...comment,
-                authorData: enrichedAuthor,
-                replies: enrichedReplies,
-            };
-        }));
-    };
 
     const handleLike = async (postId) => {
         try {
@@ -89,6 +56,56 @@ export default function Profile() {
             setPosts(posts.map(p => p._id === postId ? { ...res.data, authorData: p.authorData } : p));
         } catch (err) {
             console.error('Erreur like', err);
+        }
+    };
+
+    const handleAddComment = async (postId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
+            const updatedPost = res.data;
+
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
+        } catch (err) {
+            console.error('Erreur commentaire', err);
+        }
+    };
+
+    const handleReply = async (postId, commentId, text) => {
+        try {
+            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
+            const updatedPost = res.data;
+
+            let authorData = null;
+            try {
+                const userRes = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                    withCredentials: true,
+                });
+                authorData = userRes.data;
+            } catch (err) {
+                console.error("Erreur récupération de l’auteur du post", err);
+            }
+
+            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+            setPosts(posts.map(p =>
+                p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+            ));
+        } catch (err) {
+            console.error('Erreur réponse', err);
         }
     };
 
@@ -111,92 +128,91 @@ export default function Profile() {
         }
     };
 
-    const handleAddComment = async (postId, text) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/comment`, { text }, { withCredentials: true });
-            const updatedPost = res.data;
-
-            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
-
-            let authorData = null;
+    const enrichCommentsWithUser = async (comments) => {
+        return Promise.all(comments.map(async (comment) => {
+            let enrichedAuthor = null;
             try {
-                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${comment.author}`, {
                     withCredentials: true,
                 });
-                authorData = resAuthor.data;
-            } catch {}
+                enrichedAuthor = res.data;
+            } catch (err) {
+                console.warn("Erreur récupération auteur du commentaire", err);
+            }
 
-            setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
-        } catch (err) {
-            console.error('Erreur commentaire', err);
-        }
-    };
+            const enrichedReplies = await Promise.all((comment.replies || []).map(async (reply) => {
+                let replyAuthor = null;
+                try {
+                    const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${reply.author}`, {
+                        withCredentials: true,
+                    });
+                    replyAuthor = res.data;
+                } catch (err) {
+                    console.warn("Erreur récupération auteur de la réponse", err);
+                }
+                return { ...reply, authorData: replyAuthor };
+            }));
 
-    const handleReply = async (postId, commentId, text) => {
-        try {
-            const res = await axios.post(`/api/posts/${postId}/comments/${commentId}/reply`, { text }, { withCredentials: true });
-            const updatedPost = res.data;
-
-            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
-
-            let authorData = null;
-            try {
-                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
-                    withCredentials: true,
-                });
-                authorData = resAuthor.data;
-            } catch {}
-
-            setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
-        } catch (err) {
-            console.error('Erreur réponse', err);
-        }
+            return {
+                ...comment,
+                authorData: enrichedAuthor,
+                replies: enrichedReplies,
+            };
+        }));
     };
 
     const handleDeleteComment = async (postId, commentId) => {
         if (!confirm("Supprimer ce commentaire ?")) return;
-        try {
-            const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}`, { withCredentials: true });
-            const updatedPost = res.data;
-
-            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
-
-            let authorData = null;
             try {
-                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
-                    withCredentials: true,
-                });
-                authorData = resAuthor.data;
-            } catch {}
+                const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}`, { withCredentials: true });
+                const updatedPost = res.data;
 
-            setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
-        } catch (err) {
-            console.error("Erreur suppression commentaire", err);
-        }
+                let authorData = null;
+                try {
+                    const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                        withCredentials: true,
+                    });
+                    authorData = resAuthor.data;
+                } catch (err) {
+                    console.error("Erreur récupération de l’auteur du post", err);
+                }
+
+                const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+                setPosts(posts.map(p =>
+                    p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+                ));
+            } catch (err) {
+                console.error("Erreur suppression commentaire", err);
+            }
     };
 
     const handleDeleteReply = async (postId, commentId, replyId) => {
         if (!confirm("Supprimer cette réponse ?")) return;
-        try {
-            const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
-                withCredentials: true,
-            });
-            const updatedPost = res.data;
-
-            const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
-
-            let authorData = null;
             try {
-                const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                const res = await axios.delete(`/api/posts/${postId}/comments/${commentId}/replies/${replyId}`, {
                     withCredentials: true,
                 });
-                authorData = resAuthor.data;
-            } catch {}
+                const updatedPost = res.data;
 
-            setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
-        } catch (err) {
-            console.error("Erreur suppression réponse", err);
-        }
+                let authorData = null;
+                try {
+                    const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, {
+                        withCredentials: true,
+                    });
+                    authorData = resAuthor.data;
+                } catch (err) {
+                    console.error("Erreur récupération de l’auteur du post", err);
+                }
+
+                const enrichedComments = await enrichCommentsWithUser(updatedPost.comments || []);
+
+                setPosts(posts.map(p =>
+                    p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p
+                ));
+            } catch (err) {
+                console.error("Erreur suppression réponse", err);
+            }
     };
 
     return (
@@ -211,9 +227,14 @@ export default function Profile() {
                                 src="/assets/icones_divers/profile_icon.png"
                                 alt="Photo de profil"
                                 className="w-full h-full object-cover"
-                                width={128}
-                                height={128}
+                                onError={(e) => {
+                                    e.currentTarget.style.display = "none"
+                                    e.currentTarget.nextElementSibling.style.display = "flex"
+                                }}
                             />
+                            <div className="hidden w-full h-full items-center justify-center text-2xl font-semibold text-teal-700">
+                                PP
+                            </div>
                         </div>
                     </div>
 
@@ -250,5 +271,5 @@ export default function Profile() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

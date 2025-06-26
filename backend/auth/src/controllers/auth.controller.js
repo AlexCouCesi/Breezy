@@ -86,16 +86,16 @@ export const authenticate = async (req, res) => {
         if (!user) return res.status(401).json({ message: "Utilisateur introuvable" });
 
         res.status(200).json({
-            _id: user._id,
+            id: user._id,
             username: user.username,
             email: user.email,
             role: user.role
         });
     } catch (err) {
         if (err.name === 'TokenExpiredError')
-            return res.status(401).json({ message: "Token expiré " + err.message });
+            return res.status(401).json({ message: "Token expiré" });
 
-        return res.status(401).json({ message: "Token invalide " + err.message });
+        return res.status(401).json({ message: "Token invalide" });
     }
 };
 
