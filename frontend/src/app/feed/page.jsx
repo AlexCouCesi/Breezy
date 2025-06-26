@@ -30,7 +30,7 @@ export default function FeedPage() {
                         try {
                             const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${post.author}`, { withCredentials: true });
                             authorData = res.data;
-                        } catch {}
+                        } catch { }
 
                         const enrichedComments = await enrichCommentsWithUser(post.comments || []);
                         return { ...post, authorData, comments: enrichedComments };
@@ -52,7 +52,7 @@ export default function FeedPage() {
             try {
                 const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${comment.author}`, { withCredentials: true });
                 enrichedAuthor = res.data;
-            } catch {}
+            } catch { }
 
             const enrichedReplies = await Promise.all((comment.replies || []).map(async (reply) => {
                 if (!reply?.author) return reply;
@@ -61,7 +61,7 @@ export default function FeedPage() {
                 try {
                     const res = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${reply.author}`, { withCredentials: true });
                     replyAuthor = res.data;
-                } catch {}
+                } catch { }
                 return { ...reply, authorData: replyAuthor };
             }));
 
@@ -107,7 +107,7 @@ export default function FeedPage() {
                     withCredentials: true,
                 });
                 authorData = userRes.data;
-            } catch {}
+            } catch { }
 
             setPosts([{ ...newPost, authorData }, ...posts]);
             setNewContent('');
@@ -137,7 +137,7 @@ export default function FeedPage() {
             try {
                 const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, { withCredentials: true });
                 authorData = resAuthor.data;
-            } catch {}
+            } catch { }
 
             setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
         } catch (err) {
@@ -155,7 +155,7 @@ export default function FeedPage() {
             try {
                 const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, { withCredentials: true });
                 authorData = resAuthor.data;
-            } catch {}
+            } catch { }
 
             setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
         } catch (err) {
@@ -184,7 +184,7 @@ export default function FeedPage() {
             try {
                 const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, { withCredentials: true });
                 authorData = resAuthor.data;
-            } catch {}
+            } catch { }
 
             setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
         } catch (err) {
@@ -203,7 +203,7 @@ export default function FeedPage() {
             try {
                 const resAuthor = await axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${updatedPost.author}`, { withCredentials: true });
                 authorData = resAuthor.data;
-            } catch {}
+            } catch { }
 
             setPosts(posts.map(p => p._id === postId ? { ...updatedPost, authorData, comments: enrichedComments } : p));
         } catch (err) {
@@ -212,8 +212,8 @@ export default function FeedPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-            <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="container mx-auto h-[calc(100vh-3rem)] flex flex-col">
+            <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
                 <h1 className="text-3xl font-bold text-slate-800 mb-6">Page d'accueil</h1>
 
                 {/* Zone de publication */}
@@ -271,11 +271,10 @@ export default function FeedPage() {
                         </label>
                         <button
                             onClick={handlePublish}
-                            className={`px-6 py-2 rounded text-white transition-colors duration-200 ${
-                                newContent.length > 250 || (!newContent.trim() && !selectedImage)
+                            className={`px-6 py-2 rounded text-white transition-colors duration-200 ${newContent.length > 250 || (!newContent.trim() && !selectedImage)
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-emerald-500 hover:bg-emerald-600'
-                            }`}
+                                }`}
                             disabled={newContent.length > 250 || (!newContent.trim() && !selectedImage)}
                         >
                             Publier
@@ -284,20 +283,18 @@ export default function FeedPage() {
                 </div>
 
                 {/* Liste des posts */}
-                <div className="space-y-4">
-                    {posts.map(post => (
-                        <PostCard
-                            key={post._id}
-                            post={post}
-                            onLike={() => handleLike(post._id)}
-                            onComment={(text) => handleAddComment(post._id, text)}
-                            onReply={(commentId, text) => handleReply(post._id, commentId, text)}
-                            onDelete={() => handleDelete(post._id)}
-                            onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
-                            onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
-                        />
-                    ))}
-                </div>
+                {posts.map(post => (
+                    <PostCard
+                        key={post._id}
+                        post={post}
+                        onLike={() => handleLike(post._id)}
+                        onComment={(text) => handleAddComment(post._id, text)}
+                        onReply={(commentId, text) => handleReply(post._id, commentId, text)}
+                        onDelete={() => handleDelete(post._id)}
+                        onDeleteComment={(postId, commentId) => handleDeleteComment(postId, commentId)}
+                        onDeleteReply={(postId, commentId, replyId) => handleDeleteReply(postId, commentId, replyId)}
+                    />
+                ))}
             </div>
         </div>
     );

@@ -64,7 +64,6 @@ async function authenticateUser(req, res) {
 
 	// Appelle le service d'auth pour authentifier l'utilisateur
 	try {
-		console.log('Authentification avec token:', token);
 		const response = await axios.get('http://auth:4000/api/auth/authenticate', {
 			headers: { Authorization: 'Bearer ' + token }
 		});
