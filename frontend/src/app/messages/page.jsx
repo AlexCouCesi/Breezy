@@ -1,4 +1,5 @@
 import React from 'react';
+import FollowedList from '@/components/followedlist';
 
 export default function MessagesPage() {
   return (

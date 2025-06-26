@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import axios from '@/utils/axios';
 import PostCard from '@/components/postcard';
+import FollowedList from '@/components/followedlist';
 
 export default function Profile() {
     const router = useRouter();
     const [posts, setPosts] = useState([]);
     const [user, setUser] = useState(null);
+    const [followingUsersData, setFollowingUsersData] = useState([]);
 
     useEffect(() => {
         const token = Cookies.get('accessToken');
@@ -53,6 +55,23 @@ export default function Profile() {
 
         fetchPosts();
     }, [router]);
+
+    useEffect(() => {
+    const fetchFollowingUsers = async () => {
+        if (user?.following?.length) {
+        try {
+            const responses = await Promise.all(
+            user.following.map(id => axios.get(`${process.env.NEXT_PUBLIC_USERS_URL}/${id}`, { withCredentials: true }))
+            );
+            setFollowingUsersData(responses.map(res => res.data));
+        } catch (err) {
+            console.error("Erreur lors du chargement des abonnements", err);
+        }
+        }
+    };
+
+    fetchFollowingUsers();
+    }, [user]);
 
     const enrichCommentsWithUser = async (comments) => {
         return Promise.all(comments.map(async (comment) => {
@@ -199,7 +218,21 @@ export default function Profile() {
         }
     };
 
-    return (
+    const handleUnfollow = async (userId) => {
+    try {
+        await axios.post(`${process.env.NEXT_PUBLIC_USERS_URL}/${userId}/unfollow`, {}, { withCredentials: true });
+        setUser(prev => ({
+        ...prev,
+        following: prev.following.filter(id => id !== userId),
+        }));
+
+        setFollowingUsersData(prev => prev.filter(user => user._id !== userId));
+    } catch (err) {
+        console.error("Erreur désabonnement dans profil", err);
+    }
+    };
+
+    return (<>
         <div className="container h-[calc(100vh-3rem)] flex flex-col">
             <div className="space-y-4 flex-1 overflow-y-auto min-h-0">
                 <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50">
@@ -266,5 +299,9 @@ export default function Profile() {
                 </div>
             </div>
         </div>
+        {/* Menu radial droit – hors container central */}
+        <div className="fixed top-6 right-6 z-50">
+            <FollowedList followingList={followingUsersData} onUnfollow={handleUnfollow} />
+        </div></>
     );
 }
