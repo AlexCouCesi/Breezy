@@ -19,7 +19,7 @@ export default function Profile() {
         }
         const userId = JSON.parse(atob(token.split('.')[1])).id;
 
-        axios.get('/api/auth/me', { withCredentials: true })
+        axios.get('/api/users/me', { withCredentials: true })
             .then(res => setUser(res.data))
             .catch(() => {});
 
@@ -223,18 +223,23 @@ export default function Profile() {
                 <div className="flex flex-col sm:flex-row gap-6 mb-8">
                     <div className="flex-shrink-0">
                         <div className="w-32 h-32 rounded-full border-4 border-teal-100 bg-gradient-to-br from-teal-100 to-emerald-100 flex items-center justify-center overflow-hidden">
-                            <Image
-                                src="/assets/icones_divers/profile_icon.png"
-                                alt="Photo de profil"
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                    e.currentTarget.style.display = "none"
-                                    e.currentTarget.nextElementSibling.style.display = "flex"
-                                }}
-                            />
-                            <div className="hidden w-full h-full items-center justify-center text-2xl font-semibold text-teal-700">
-                                PP
-                            </div>
+                            {user?.profilePicture ? (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/${user.profilePicture}`}
+                                    alt="Photo de profil"
+                                    width={128}
+                                    height={128}
+                                    className="object-cover w-32 h-32 rounded-full"
+                                />
+                            ) : (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/assets/icones_divers/profile_icon.png`}
+                                    alt="Photo de profil"
+                                    width={128}
+                                    height={128}
+                                    className="object-cover w-32 h-32 rounded-full"
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -242,7 +247,7 @@ export default function Profile() {
                         <div className="p-6 border border-teal-100 bg-white/70 backdrop-blur-sm rounded-lg shadow-sm">
                             <h2 className="text-xl font-semibold text-slate-800 mb-1">{user?.username}</h2>
                             <p className="text-teal-600 mb-4">@{user?.username}</p>
-                            <p className="text-slate-600 leading-relaxed">Biographie courte</p>
+                            <p className="text-slate-600 leading-relaxed">{user?.biography || "Biographie courte"}</p>
                         </div>
                     </div>
                 </div>

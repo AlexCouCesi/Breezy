@@ -113,9 +113,13 @@ export default function ProfileModification() {
                                         className="object-cover w-32 h-32 rounded-full"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-5xl">
-                                        ?
-                                    </div>
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}/assets/icones_divers/profile_icon.png`}
+                                    alt="Photo de profil"
+                                    width={128}
+                                    height={128}
+                                    className="object-cover w-32 h-32 rounded-full"
+                                />
                                 )}
                             </div>
                             <label>
